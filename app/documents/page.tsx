@@ -1,10 +1,8 @@
-import { Placeholder } from '@/components/Placeholder';
+import { getDocuments } from '@/lib/loaders';
+import { DocumentsClient } from './DocumentsClient';
 
 export default function DocumentsPage() {
-  return (
-    <Placeholder
-      title="Status & SOP Library"
-      summary="Finished executive status reports and SOPs, rendered as documents."
-    />
-  );
+  const { statusReports, sops } = getDocuments();
+
+  return <DocumentsClient statusReports={statusReports} sops={sops} />;
 }

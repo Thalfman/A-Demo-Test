@@ -31,7 +31,7 @@ export default function HomePage() {
             <h3 className="font-medium">{module.title}</h3>
             <p className="mt-1 text-sm text-ink-muted">{module.summary}</p>
             <p className="mt-3 text-xs font-medium uppercase tracking-wide text-brand">
-              Specced — see PLAN.md
+              Open module →
             </p>
           </Link>
         ))}

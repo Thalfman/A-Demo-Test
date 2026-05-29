@@ -1,10 +1,20 @@
-import { Placeholder } from '@/components/Placeholder';
+import { getEvm, getMeta, getPortfolio } from '@/lib/loaders';
+import { normalizePortfolio } from '@/lib/normalize';
+import { PortfolioClient } from './PortfolioClient';
 
 export default function PortfolioPage() {
+  const { projects: raw, aiBriefing } = getPortfolio();
+  const { projects, summary } = normalizePortfolio(raw);
+  const { portfolio } = getEvm();
+  const { divisions } = getMeta();
+
   return (
-    <Placeholder
-      title="Portfolio Health"
-      summary="Status, budget, and schedule across the portfolio."
+    <PortfolioClient
+      projects={projects}
+      aiBriefing={aiBriefing}
+      portfolioMetrics={portfolio.metrics}
+      divisions={divisions}
+      flaggedFields={summary.flaggedFields}
     />
   );
 }
