@@ -29,15 +29,9 @@ const alignClass: Record<Align, string> = {
   center: 'text-center',
 };
 
-function compare(
-  a: string | number | null | undefined,
-  b: string | number | null | undefined,
-): number {
-  const aMissing = a == null || a === '';
-  const bMissing = b == null || b === '';
-  if (aMissing && bMissing) return 0;
-  if (aMissing) return 1; // nulls/blanks always sort last
-  if (bMissing) return -1;
+/** Compare two present (non-missing) values. Missing handling is applied by the
+ *  caller so it stays independent of sort direction. */
+function compareValues(a: string | number, b: string | number): number {
   if (typeof a === 'number' && typeof b === 'number') return a - b;
   return String(a).localeCompare(String(b));
 }
@@ -77,9 +71,18 @@ export function DataTable<T>({
     const col = columns.find((c) => c.key === sort.key);
     if (!col?.sortValue) return rows;
     const dir = sort.dir === 'asc' ? 1 : -1;
-    return [...rows].sort(
-      (a, b) => compare(col.sortValue!(a), col.sortValue!(b)) * dir,
-    );
+    return [...rows].sort((ra, rb) => {
+      const a = col.sortValue!(ra);
+      const b = col.sortValue!(rb);
+      const aMissing = a == null || a === '';
+      const bMissing = b == null || b === '';
+      // Missing values always sort last, independent of direction.
+      if (aMissing || bMissing) {
+        if (aMissing && bMissing) return 0;
+        return aMissing ? 1 : -1;
+      }
+      return compareValues(a, b) * dir;
+    });
   }, [rows, sort, columns]);
 
   const toggleSort = (col: Column<T>) => {
@@ -99,6 +102,11 @@ export function DataTable<T>({
             {columns.map((col) => {
               const sortable = Boolean(col.sortValue);
               const active = sort?.key === col.key;
+              const indicator = active
+                ? sort?.dir === 'asc'
+                  ? '▲'
+                  : '▼'
+                : '↕';
               return (
                 <th
                   key={col.key}
@@ -112,19 +120,24 @@ export function DataTable<T>({
                   }
                   className={`whitespace-nowrap px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink-muted ${
                     alignClass[col.align ?? 'left']
-                  } ${sortable ? 'cursor-pointer select-none hover:text-ink' : ''} ${
-                    col.headerClassName ?? ''
-                  }`}
-                  onClick={sortable ? () => toggleSort(col) : undefined}
+                  } ${col.headerClassName ?? ''}`}
                 >
-                  <span className="inline-flex items-center gap-1">
-                    {col.header}
-                    {sortable ? (
+                  {sortable ? (
+                    <button
+                      type="button"
+                      onClick={() => toggleSort(col)}
+                      className="inline-flex items-center gap-1 select-none rounded text-inherit hover:text-ink focus:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                    >
+                      {col.header}
                       <span className="text-[0.65rem] text-ink-muted">
-                        {active ? (sort?.dir === 'asc' ? '▲' : '▼') : '↕'}
+                        {indicator}
                       </span>
-                    ) : null}
-                  </span>
+                    </button>
+                  ) : (
+                    <span className="inline-flex items-center gap-1">
+                      {col.header}
+                    </span>
+                  )}
                 </th>
               );
             })}
