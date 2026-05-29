@@ -161,8 +161,22 @@ export function DataTable<T>({
                 <tr
                   key={getRowKey ? getRowKey(row, index) : index}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onRowClick(row);
+                          }
+                        }
+                      : undefined
+                  }
+                  tabIndex={clickable ? 0 : undefined}
+                  aria-selected={clickable ? active : undefined}
                   className={`border-b border-border last:border-0 ${
-                    clickable ? 'cursor-pointer' : ''
+                    clickable
+                      ? 'cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-brand'
+                      : ''
                   } ${active ? 'bg-surface' : clickable ? 'hover:bg-surface' : ''}`}
                 >
                   {columns.map((col) => (
