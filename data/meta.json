@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0.0",
+  "seed": 1337,
+  "generatedAt": "2025-05-01",
+  "divisions": [
+    {
+      "id": "eng",
+      "name": "Engineering"
+    },
+    {
+      "id": "infra",
+      "name": "Infrastructure"
+    },
+    {
+      "id": "data",
+      "name": "Data & Analytics"
+    },
+    {
+      "id": "cx",
+      "name": "Customer Experience"
+    }
+  ],
+  "counts": {
+    "projects": 14,
+    "statusReports": 2,
+    "sops": 2,
+    "discrepancies": 16
+  },
+  "dataQuality": {
+    "totalProjects": 14,
+    "flaggedFields": 60,
+    "byCode": {
+      "missing": 10,
+      "coerced": 1,
+      "date_drift": 27,
+      "spelling_normalized": 10,
+      "stale": 2,
+      "rounded_estimate": 10
+    }
+  },
+  "modules": [
+    {
+      "id": "portfolio",
+      "title": "Portfolio Health",
+      "route": "/portfolio",
+      "dataFile": "data/portfolio.json",
+      "summary": "Status, budget, and schedule across the portfolio."
+    },
+    {
+      "id": "evm",
+      "title": "EVM & Variance",
+      "route": "/evm",
+      "dataFile": "data/evm.json",
+      "summary": "CPI/SPI/variance with an AI status narrative."
+    },
+    {
+      "id": "reconciliation",
+      "title": "Cross-System Reconciliation",
+      "route": "/reconciliation",
+      "dataFile": "data/reconciliation.json",
+      "summary": "Discrepancies between two divergent exports."
+    },
+    {
+      "id": "documents",
+      "title": "Status & SOP Library",
+      "route": "/documents",
+      "dataFile": "data/documents.json",
+      "summary": "Finished executive status reports and SOPs."
+    }
+  ]
+}

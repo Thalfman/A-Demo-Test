@@ -1,0 +1,83 @@
+{
+  "statusReports": [
+    {
+      "id": "DOC-STATUS-001",
+      "type": "status-report",
+      "title": "Weekly Executive Status — Portfolio",
+      "summary": "One-page roll-up of portfolio health, risks, and asks.",
+      "aiGenerated": true,
+      "generatedAt": "2025-05-01",
+      "meta": {
+        "author": "AI Status Generator",
+        "audience": "Executive Steering"
+      },
+      "tags": [
+        "weekly",
+        "executive",
+        "portfolio"
+      ],
+      "body": "## Headline\nPortfolio is running hot: CPI 0.99, SPI 0.99 across 14 projects ($20.46M committed).\n\n## Status mix\n- On Track: 7\n- At Risk: 3\n- Off Track: 4\n\n## Top concern\nEverest Data Lake — CPI 0.69, SPI 0.74. Recovery plan requested.\n\n## Ask\nApprove weekly cost-actuals cadence and a re-baseline for the troubled project."
+    },
+    {
+      "id": "DOC-STATUS-002",
+      "type": "status-report",
+      "title": "Project Deep Dive — Everest Data Lake",
+      "summary": "Variance breakdown and recovery options for the troubled project.",
+      "aiGenerated": true,
+      "generatedAt": "2025-05-01",
+      "meta": {
+        "author": "AI Status Generator",
+        "audience": "Program Management",
+        "relatedProjectId": "PRJ-005"
+      },
+      "tags": [
+        "deep-dive",
+        "variance",
+        "recovery"
+      ],
+      "body": "## Where it stands\nBudget $696k, forecast EAC $1.01M (VAC $-313k).\nCPI 0.69 and SPI 0.74 — over cost and behind schedule.\n\n## Why\nScope creep in execution plus underestimated integration effort. Burn outpacing earned value for three reporting periods.\n\n## Options\n1. Re-baseline scope; defer non-critical features.\n2. Add senior delivery lead to unblock integration.\n3. Hold monthly EAC reviews until CPI recovers above 0.90."
+    }
+  ],
+  "sops": [
+    {
+      "id": "DOC-SOP-001",
+      "type": "sop",
+      "title": "SOP — EVM Variance Response",
+      "summary": "When and how to react to CPI/SPI breaches.",
+      "aiGenerated": true,
+      "generatedAt": "2025-05-01",
+      "meta": {
+        "author": "AI SOP Generator",
+        "audience": "Project Managers",
+        "version": "1.2",
+        "effectiveDate": "2025-05-01"
+      },
+      "tags": [
+        "sop",
+        "evm",
+        "governance"
+      ],
+      "body": "## Purpose\nStandardize the response when a project breaches earned-value thresholds.\n\n## Triggers\n- CPI or SPI below 0.90 for two consecutive periods.\n- VAC exceeding 10% of BAC.\n\n## Procedure\n1. PM logs a variance note with root cause within 48h.\n2. Recompute EAC; flag if EAC > BAC × 1.1.\n3. Escalate to program review; attach recovery plan.\n4. Track corrective actions to closure in the weekly status."
+    },
+    {
+      "id": "DOC-SOP-002",
+      "type": "sop",
+      "title": "SOP — Cross-System Reconciliation",
+      "summary": "Reconciling Finance and PMO exports before reporting.",
+      "aiGenerated": true,
+      "generatedAt": "2025-05-01",
+      "meta": {
+        "author": "AI SOP Generator",
+        "audience": "PMO Analysts",
+        "version": "1.0",
+        "effectiveDate": "2025-05-01"
+      },
+      "tags": [
+        "sop",
+        "reconciliation",
+        "data-quality"
+      ],
+      "body": "## Purpose\nEnsure portfolio reporting uses a reconciled, single source of truth.\n\n## Procedure\n1. Pull Finance and PMO exports for the same period.\n2. Match on project id; list records present on only one side.\n3. Flag budget/status/date mismatches and any duplicates.\n4. Resolve high-severity items before publishing (last run: 16 discrepancies).\n5. Record the reconciled set as the period of record."
+    }
+  ]
+}

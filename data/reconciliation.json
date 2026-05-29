@@ -1,0 +1,414 @@
+{
+  "financeExport": {
+    "source": "Finance System",
+    "exportedAt": "2025-05-01",
+    "records": [
+      {
+        "projectId": "PRJ-001",
+        "name": "Atlas Migration",
+        "status": "Off Track",
+        "budget": 522000,
+        "actualCost": 109518.64,
+        "owner": "A. Rivera",
+        "endDate": "2025-09-20"
+      },
+      {
+        "projectId": "PRJ-002",
+        "name": "Beacon Analytics Platform",
+        "status": "On Track",
+        "budget": 302000,
+        "actualCost": 153293.36,
+        "owner": "J. Chen",
+        "endDate": "2025-06-28"
+      },
+      {
+        "projectId": "PRJ-003",
+        "name": "Cedar CRM Rollout",
+        "status": "On Track",
+        "budget": 886000,
+        "actualCost": 673847.06,
+        "owner": "M. Okafor",
+        "endDate": "2025-06-29"
+      },
+      {
+        "projectId": "PRJ-004",
+        "name": "Delta Warehouse Upgrade",
+        "status": "Off Track",
+        "budget": 707000,
+        "actualCost": 38661.48,
+        "owner": "S. Patel",
+        "endDate": "2025-12-13"
+      },
+      {
+        "projectId": "PRJ-005",
+        "name": "Everest Data Lake",
+        "status": "Off Track",
+        "budget": 696000,
+        "actualCost": 447860.87,
+        "owner": "T. Nguyen",
+        "endDate": "2025-09-22"
+      },
+      {
+        "projectId": "PRJ-006",
+        "name": "Falcon Mobile App",
+        "status": "On Track",
+        "budget": 863000,
+        "actualCost": 479517.1,
+        "owner": "L. Romano",
+        "endDate": "2025-12-24"
+      },
+      {
+        "projectId": "PRJ-007",
+        "name": "Granite Billing System",
+        "status": "On Track",
+        "budget": 556000,
+        "actualCost": 442626.56,
+        "owner": "D. Schultz",
+        "endDate": "2025-06-03"
+      },
+      {
+        "projectId": "PRJ-009",
+        "name": "Iris ML Pipeline",
+        "status": "Off Track",
+        "budget": 735000,
+        "actualCost": 430911.68,
+        "owner": "P. Larsson",
+        "endDate": "2025-08-12"
+      },
+      {
+        "projectId": "PRJ-010",
+        "name": "Juniper Network Refresh",
+        "status": "On Track",
+        "budget": 776000,
+        "actualCost": 441069.4,
+        "owner": "R. Ferreira",
+        "endDate": "2026-05-21"
+      },
+      {
+        "projectId": "PRJ-011",
+        "name": "Kestrel Security Program",
+        "status": "At Risk",
+        "budget": 1357000,
+        "actualCost": 329584.89,
+        "owner": "C. Yamamoto",
+        "endDate": "2026-06-14"
+      },
+      {
+        "projectId": "PRJ-012",
+        "name": "Lumen Reporting Suite",
+        "status": "At Risk",
+        "budget": 1796000,
+        "actualCost": 381718.16,
+        "owner": "B. Novak",
+        "endDate": "2025-09-17"
+      },
+      {
+        "projectId": "PRJ-013",
+        "name": "Meridian ERP Integration",
+        "status": "At Risk",
+        "budget": 8400000,
+        "actualCost": 6455422.96,
+        "owner": "E. Haddad",
+        "endDate": "2025-07-15"
+      },
+      {
+        "projectId": "PRJ-014",
+        "name": "Nimbus Cloud Migration",
+        "status": "On Track",
+        "budget": 2303000,
+        "actualCost": 1942110.22,
+        "owner": "G. Petrov",
+        "endDate": "2025-05-25"
+      }
+    ]
+  },
+  "pmoExport": {
+    "source": "PMO Tracker",
+    "exportedAt": "2025-04-29",
+    "records": [
+      {
+        "projectId": "PRJ-001",
+        "name": "Atlas Migration",
+        "status": "Off Track",
+        "budget": 500000,
+        "actualCost": 109518.64,
+        "owner": "A. Rivera",
+        "endDate": "2025-09-20"
+      },
+      {
+        "projectId": "PRJ-002",
+        "name": "Beacon Analytics Platform",
+        "status": "On Track",
+        "budget": 302000,
+        "actualCost": 153000,
+        "owner": null,
+        "endDate": "Jun 28, 2025"
+      },
+      {
+        "projectId": "PRJ-004",
+        "name": "Delta Warehouse Upgrade",
+        "status": "At Risk",
+        "budget": 707000,
+        "actualCost": 38661.48,
+        "owner": "S. Patel",
+        "endDate": "12/13/2025"
+      },
+      {
+        "projectId": "PRJ-005",
+        "name": "Everest Data Lake",
+        "status": "Off Track",
+        "budget": 700000,
+        "actualCost": 447860.87,
+        "owner": "T. Nguyen",
+        "endDate": "Sep 22, 2025"
+      },
+      {
+        "projectId": "PRJ-006",
+        "name": "Falcon Mobile App",
+        "status": "On Track",
+        "budget": 863000,
+        "actualCost": 480000,
+        "owner": "L. Romano",
+        "endDate": "2025-12-24"
+      },
+      {
+        "projectId": "PRJ-006",
+        "name": "Falcon Mobile App",
+        "status": "On Track",
+        "budget": 863000,
+        "actualCost": 480000,
+        "owner": "L. Romano",
+        "endDate": "2025-12-24"
+      },
+      {
+        "projectId": "PRJ-007",
+        "name": "Granite Billing System",
+        "status": "On Track",
+        "budget": 556000,
+        "actualCost": 442626.56,
+        "owner": "D. Schultz",
+        "endDate": "Jun 17, 2025"
+      },
+      {
+        "projectId": "PRJ-008",
+        "name": "Harbor API Gateway",
+        "status": "On Track",
+        "budget": 557000,
+        "actualCost": 46669.41,
+        "owner": "K. Abboud",
+        "endDate": "09/07/2026"
+      },
+      {
+        "projectId": "PRJ-009",
+        "name": "Iris ML Pipeline",
+        "status": "Off Track",
+        "budget": 750000,
+        "actualCost": 430911.68,
+        "owner": "P. Larsson",
+        "endDate": "2025-08-12"
+      },
+      {
+        "projectId": "PRJ-010",
+        "name": "Juniper Network Refresh",
+        "status": "On Track",
+        "budget": 776000,
+        "actualCost": 441000,
+        "owner": null,
+        "endDate": "2026-05-21"
+      },
+      {
+        "projectId": "PRJ-011",
+        "name": "Kestrel Security Program",
+        "status": "On Track",
+        "budget": 1357000,
+        "actualCost": 329584.89,
+        "owner": "C. Yamamoto",
+        "endDate": "Jun 14, 2026"
+      },
+      {
+        "projectId": "PRJ-012",
+        "name": "Lumen Reporting Suite",
+        "status": "At Risk",
+        "budget": 1800000,
+        "actualCost": 381718.16,
+        "owner": "B. Novak",
+        "endDate": "Sep 17, 2025"
+      },
+      {
+        "projectId": "PRJ-013",
+        "name": "Meridian ERP Integration",
+        "status": "At Risk",
+        "budget": 8400000,
+        "actualCost": 6455422.96,
+        "owner": "E. Haddad",
+        "endDate": "Jul 29, 2025"
+      },
+      {
+        "projectId": "PRJ-014",
+        "name": "Nimbus Cloud Migration",
+        "status": "On Track",
+        "budget": 2303000,
+        "actualCost": 1942110.22,
+        "owner": "G. Petrov",
+        "endDate": "May 25, 2025"
+      }
+    ]
+  },
+  "discrepancies": [
+    {
+      "projectId": "PRJ-001",
+      "name": "Atlas Migration",
+      "field": "budget",
+      "type": "value_mismatch",
+      "financeValue": 522000,
+      "pmoValue": 500000,
+      "severity": "high"
+    },
+    {
+      "projectId": "PRJ-002",
+      "name": "Beacon Analytics Platform",
+      "field": "actualCost",
+      "type": "value_mismatch",
+      "financeValue": 153293.36,
+      "pmoValue": 153000,
+      "severity": "medium"
+    },
+    {
+      "projectId": "PRJ-002",
+      "name": "Beacon Analytics Platform",
+      "field": "owner",
+      "type": "value_mismatch",
+      "financeValue": "J. Chen",
+      "pmoValue": null,
+      "severity": "low"
+    },
+    {
+      "projectId": "PRJ-003",
+      "name": "Cedar CRM Rollout",
+      "field": "record",
+      "type": "missing_in_pmo",
+      "financeValue": "present",
+      "pmoValue": null,
+      "severity": "high"
+    },
+    {
+      "projectId": "PRJ-004",
+      "name": "Delta Warehouse Upgrade",
+      "field": "status",
+      "type": "status_mismatch",
+      "financeValue": "Off Track",
+      "pmoValue": "At Risk",
+      "severity": "high"
+    },
+    {
+      "projectId": "PRJ-005",
+      "name": "Everest Data Lake",
+      "field": "budget",
+      "type": "value_mismatch",
+      "financeValue": 696000,
+      "pmoValue": 700000,
+      "severity": "high"
+    },
+    {
+      "projectId": "PRJ-006",
+      "name": "Falcon Mobile App",
+      "field": "record",
+      "type": "duplicate",
+      "financeValue": 1,
+      "pmoValue": 2,
+      "severity": "medium"
+    },
+    {
+      "projectId": "PRJ-006",
+      "name": "Falcon Mobile App",
+      "field": "actualCost",
+      "type": "value_mismatch",
+      "financeValue": 479517.1,
+      "pmoValue": 480000,
+      "severity": "medium"
+    },
+    {
+      "projectId": "PRJ-007",
+      "name": "Granite Billing System",
+      "field": "endDate",
+      "type": "date_mismatch",
+      "financeValue": "2025-06-03",
+      "pmoValue": "Jun 17, 2025",
+      "severity": "medium"
+    },
+    {
+      "projectId": "PRJ-008",
+      "name": "Harbor API Gateway",
+      "field": "record",
+      "type": "missing_in_finance",
+      "financeValue": null,
+      "pmoValue": "present",
+      "severity": "high"
+    },
+    {
+      "projectId": "PRJ-009",
+      "name": "Iris ML Pipeline",
+      "field": "budget",
+      "type": "value_mismatch",
+      "financeValue": 735000,
+      "pmoValue": 750000,
+      "severity": "high"
+    },
+    {
+      "projectId": "PRJ-010",
+      "name": "Juniper Network Refresh",
+      "field": "actualCost",
+      "type": "value_mismatch",
+      "financeValue": 441069.4,
+      "pmoValue": 441000,
+      "severity": "medium"
+    },
+    {
+      "projectId": "PRJ-010",
+      "name": "Juniper Network Refresh",
+      "field": "owner",
+      "type": "value_mismatch",
+      "financeValue": "R. Ferreira",
+      "pmoValue": null,
+      "severity": "low"
+    },
+    {
+      "projectId": "PRJ-011",
+      "name": "Kestrel Security Program",
+      "field": "status",
+      "type": "status_mismatch",
+      "financeValue": "At Risk",
+      "pmoValue": "On Track",
+      "severity": "high"
+    },
+    {
+      "projectId": "PRJ-012",
+      "name": "Lumen Reporting Suite",
+      "field": "budget",
+      "type": "value_mismatch",
+      "financeValue": 1796000,
+      "pmoValue": 1800000,
+      "severity": "high"
+    },
+    {
+      "projectId": "PRJ-013",
+      "name": "Meridian ERP Integration",
+      "field": "endDate",
+      "type": "date_mismatch",
+      "financeValue": "2025-07-15",
+      "pmoValue": "Jul 29, 2025",
+      "severity": "medium"
+    }
+  ],
+  "aiSummary": {
+    "aiGenerated": true,
+    "title": "Reconciliation Summary",
+    "generatedAt": "2025-05-01",
+    "body": "Finance and PMO disagree on 16 points (8 high severity). 2 records exist on only one side and 1 are duplicated in the PMO tracker — roll-ups built on either export alone will be wrong. Largest single gap: Atlas Migration budget differs by $22k. Most spread is rounding and stale status, but the missing/duplicate rows are the real risk.",
+    "bullets": [
+      "4 budget mismatches",
+      "2 records missing from one system",
+      "1 duplicated record(s) in PMO"
+    ]
+  }
+}

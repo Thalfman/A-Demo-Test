@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens — the source of truth for color/shape across the app.
+ * lib/tokens.ts mirrors these hex values for Recharts (charts can't read CSS
+ * variables cleanly). Keep the two in sync when changing a token.
+ */
+:root {
+  --color-brand: #2563eb;
+  --color-brand-muted: #93c5fd;
+
+  --color-surface: #f8fafc;
+  --color-surface-raised: #ffffff;
+  --color-border: #e2e8f0;
+
+  --color-ink: #0f172a;
+  --color-ink-muted: #64748b;
+
+  --color-status-ontrack: #16a34a;
+  --color-status-atrisk: #d97706;
+  --color-status-offtrack: #dc2626;
+
+  --radius: 0.5rem;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+}
