@@ -11,6 +11,8 @@ import type { AppDocument, DocumentType } from '@/lib/types';
 const GROUPS: { type: DocumentType; label: string; short: string }[] = [
   { type: 'status-report', label: 'Status Reports', short: 'Reports' },
   { type: 'sop', label: 'SOPs', short: 'SOPs' },
+  { type: 'meeting-notes', label: 'Meeting Notes', short: 'Meetings' },
+  { type: 'decision-log', label: 'Decision Logs', short: 'Decisions' },
 ];
 
 function DocumentCard({
@@ -55,9 +57,13 @@ function DocumentCard({
 export function DocumentsClient({
   statusReports,
   sops,
+  meetingNotes,
+  decisionLogs,
 }: {
   statusReports: AppDocument[];
   sops: AppDocument[];
+  meetingNotes: AppDocument[];
+  decisionLogs: AppDocument[];
 }) {
   const [typeFilter, setTypeFilter] = useState('');
   const [selectedId, setSelectedId] = useState<string>(
@@ -67,6 +73,8 @@ export function DocumentsClient({
   const docsByType: Record<DocumentType, AppDocument[]> = {
     'status-report': statusReports,
     sop: sops,
+    'meeting-notes': meetingNotes,
+    'decision-log': decisionLogs,
   };
 
   const visibleGroups = GROUPS.filter(
@@ -75,7 +83,7 @@ export function DocumentsClient({
   const visibleDocs = useMemo(
     () => visibleGroups.flatMap((g) => docsByType[g.type]),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [typeFilter, statusReports, sops],
+    [typeFilter, statusReports, sops, meetingNotes, decisionLogs],
   );
 
   const selected =
