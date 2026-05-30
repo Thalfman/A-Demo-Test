@@ -14,6 +14,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { Trackbar } from '@/components/Trackbar';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { formatCurrency, formatRatio } from '@/lib/format';
+import { selectPortfolioView } from '@/lib/portfolioView';
 import { getChartColors } from '@/lib/tokens';
 import {
   PROJECT_PHASES,
@@ -66,34 +67,14 @@ export function PortfolioClient({
   const onChange = (key: string, value: string) =>
     setFilters((prev) => ({ ...prev, [key]: value }));
 
-  const filtered = useMemo(
-    () =>
-      projects.filter(
-        (p) =>
-          (!filters.division || p.division === filters.division) &&
-          (!filters.status || p.status === filters.status) &&
-          (!filters.phase || p.phase === filters.phase),
-      ),
-    [projects, filters],
-  );
+  const { projects: filtered, total, totalBac, offTrack, isFiltered, statusData, divisionData } =
+    useMemo(
+      () => selectPortfolioView(projects, filters, divisions),
+      [projects, filters, divisions],
+    );
 
-  const totalBac = filtered.reduce((sum, p) => sum + p.evm.bac, 0);
-  const offTrack = filtered.filter((p) => p.status === 'Off Track').length;
-  const isFiltered = filtered.length !== projects.length;
-  const ofAll = isFiltered ? `of ${projects.length}` : undefined;
-
-  const statusData = PROJECT_STATUSES.map((status) => ({
-    status,
-    count: filtered.filter((p) => p.status === status).length,
-  }));
+  const ofAll = isFiltered ? `of ${total}` : undefined;
   const statusColorsByCell = PROJECT_STATUSES.map((s) => chart.statusColors[s]);
-
-  const divisionData = divisions.map((d) => ({
-    division: d.name,
-    bac: filtered
-      .filter((p) => p.division === d.id)
-      .reduce((sum, p) => sum + p.evm.bac, 0),
-  }));
 
   const kpis: KpiItem[] = [
     { label: 'Projects', countTo: filtered.length, hint: ofAll },

@@ -1,31 +1,23 @@
-import {
-  getDocuments,
-  getEvm,
-  getMeta,
-  getPortfolio,
-  getReconciliation,
-} from '@/lib/loaders';
+import { getDocuments, getEvm, getMeta, getReconciliation } from '@/lib/loaders';
 import { formatRatio } from '@/lib/format';
-import { normalizePortfolio } from '@/lib/normalize';
-import { getPortfolioPulse } from '@/lib/portfolioPulse';
+import { getPortfolioPulse, type PortfolioPulse } from '@/lib/portfolioPulse';
 import { LandingHero, type LandingModule } from './LandingHero';
 
 /** One-line live readout per module, computed from the synthetic data so the
- *  home page demonstrates value rather than just linking. (Derived data, not an
- *  AI artifact — rendered in neutral mono, never the reserved AI accent.) */
-function readouts(): Record<string, string> {
+ *  home page demonstrates value rather than just linking. Off-track and the
+ *  CPI/SPI come from the shared `pulse` so the cards, the hero band, and the
+ *  header all agree (§16). (Derived data, not an AI artifact — rendered in
+ *  neutral mono, never the reserved AI accent.) */
+function readouts(pulse: PortfolioPulse): Record<string, string> {
   const meta = getMeta();
-  const { metrics } = getEvm().portfolio;
-  const { projects } = normalizePortfolio(getPortfolio().projects);
   const recon = getReconciliation();
   const docs = getDocuments();
 
-  const offTrack = projects.filter((p) => p.status === 'Off Track').length;
   const highSeverity = recon.discrepancies.filter((d) => d.severity === 'high').length;
 
   return {
-    portfolio: `${meta.counts.projects} projects · ${offTrack} off-track`,
-    evm: `CPI ${formatRatio(metrics.cpi)} ${metrics.cpi < 1 ? '▼' : '▲'} · SPI ${formatRatio(metrics.spi)}`,
+    portfolio: `${meta.counts.projects} projects · ${pulse.offTrack} off-track`,
+    evm: `CPI ${formatRatio(pulse.cpi)} ${pulse.cpi < 1 ? '▼' : '▲'} · SPI ${formatRatio(pulse.spi)}`,
     reconciliation: `${recon.discrepancies.length} discrepancies · ${highSeverity} high`,
     documents: `${docs.statusReports.length} reports · ${docs.sops.length} SOPs`,
   };
@@ -33,8 +25,8 @@ function readouts(): Record<string, string> {
 
 export default function HomePage() {
   const meta = getMeta();
-  const reads = readouts();
   const pulse = getPortfolioPulse();
+  const reads = readouts(pulse);
   const modules: LandingModule[] = meta.modules.map((m) => ({
     ...m,
     readout: reads[m.id] ?? '',

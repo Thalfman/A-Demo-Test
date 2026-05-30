@@ -6,6 +6,7 @@ import { Card } from '@/components/Card';
 import { DataTable, type Column } from '@/components/DataTable';
 import { SeverityChip } from '@/components/SeverityChip';
 import { DASH, formatCurrency, formatDate, formatNumber } from '@/lib/format';
+import { analyzeReconciliation } from '@/lib/reconcile';
 import type {
   Discrepancy,
   ReconExport,
@@ -188,32 +189,15 @@ export function ReconClient({
 }) {
   const [showExports, setShowExports] = useState(false);
 
-  const { mismatch, financeIds, pmoIds, financeDups, pmoDups } = useMemo(() => {
-    const mismatch = new Set<string>();
-    for (const d of discrepancies) {
-      if (d.field && d.field !== 'record') {
-        mismatch.add(`${d.projectId}:${d.field}`);
-      }
-    }
-    const countIds = (recs: ReconRecord[]) => {
-      const counts = new Map<string, number>();
-      recs.forEach((r) =>
-        counts.set(r.projectId, (counts.get(r.projectId) ?? 0) + 1),
-      );
-      return counts;
-    };
-    const fCounts = countIds(financeExport.records);
-    const pCounts = countIds(pmoExport.records);
-    const dupsOf = (counts: Map<string, number>) =>
-      new Set([...counts].filter(([, n]) => n > 1).map(([id]) => id));
-    return {
-      mismatch,
-      financeIds: new Set(fCounts.keys()),
-      pmoIds: new Set(pCounts.keys()),
-      financeDups: dupsOf(fCounts),
-      pmoDups: dupsOf(pCounts),
-    };
-  }, [discrepancies, financeExport.records, pmoExport.records]);
+  const { mismatch, financeIds, pmoIds, financeDups, pmoDups } = useMemo(
+    () =>
+      analyzeReconciliation(
+        discrepancies,
+        financeExport.records,
+        pmoExport.records,
+      ),
+    [discrepancies, financeExport.records, pmoExport.records],
+  );
 
   const columns: Column<Discrepancy>[] = [
     {

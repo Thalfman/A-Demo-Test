@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Line, LineChart, ResponsiveContainer } from 'recharts';
 
 import { useTheme } from '@/components/theme/ThemeProvider';
@@ -25,11 +26,15 @@ export function MiniEvmChart({
   height?: number;
 }) {
   const { theme } = useTheme();
-  const c = getChartColors(theme);
+  const c = useMemo(() => getChartColors(theme), [theme]);
   const animate = useMountOnlyAnimation();
 
   return (
-    <div style={{ width: '100%', height }} aria-hidden>
+    <div
+      style={{ width: '100%', height }}
+      role="img"
+      aria-label="Portfolio earned-value curves — planned, earned, and actual cost over the trailing 12 months"
+    >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 4, right: 2, bottom: 4, left: 2 }}>
           {SERIES.map((key, i) => (
