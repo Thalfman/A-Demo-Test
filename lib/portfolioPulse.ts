@@ -8,6 +8,7 @@
 
 import { getEvm, getMeta, getPortfolio } from './loaders';
 import { normalizePortfolio } from './normalize';
+import { countOffTrack } from './portfolioView';
 
 export interface PortfolioPulse {
   projects: number;
@@ -22,7 +23,7 @@ export function getPortfolioPulse(): PortfolioPulse {
   const { projects } = normalizePortfolio(getPortfolio().projects);
   return {
     projects: meta.counts.projects,
-    offTrack: projects.filter((p) => p.status === 'Off Track').length,
+    offTrack: countOffTrack(projects),
     cpi: metrics.cpi,
     spi: metrics.spi,
   };
