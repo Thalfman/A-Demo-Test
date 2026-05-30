@@ -11,7 +11,6 @@
 
 import type {
   AppDocument,
-  DataQualityFlag,
   Discrepancy,
   EvmProjectEntry,
   Project,
@@ -27,14 +26,14 @@ export interface ProjectGraphSources {
   documents: AppDocument[];
 }
 
-/** Everything one Project carries across the four modules. */
+/** Everything one Project carries across the four modules. Data-quality flags
+ *  are read from `project.flags` — they are a Project field, not a join. */
 export interface ProjectDossier {
   project: Project;
   evm: EvmProjectEntry | null;
   discrepancies: Discrepancy[];
   actions: RecommendedAction[];
   documents: AppDocument[];
-  flags: DataQualityFlag[];
 }
 
 /**
@@ -55,7 +54,6 @@ export function selectProjectDossier(
     documents: sources.documents.filter(
       (doc) => doc.meta.relatedProjectId === projectId,
     ),
-    flags: project.flags,
   };
 }
 

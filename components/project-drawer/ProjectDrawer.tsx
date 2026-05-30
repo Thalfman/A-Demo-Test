@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -12,8 +13,9 @@ import { DataQualityChip } from '@/components/DataQualityChip';
 import { EvmLineChart } from '@/components/EvmLineChart';
 import { IndexBullet } from '@/components/IndexBullet';
 import { SeverityChip } from '@/components/SeverityChip';
+import { StatCard } from '@/components/StatCard';
 import { StatusBadge } from '@/components/StatusBadge';
-import { DASH, formatCurrency, formatPercent } from '@/lib/format';
+import { fieldValue, formatCurrency, formatPercent } from '@/lib/format';
 import { getProjectDossier } from '@/lib/projectGraphData';
 import type { ProjectDossier } from '@/lib/projectGraph';
 
@@ -41,6 +43,12 @@ export function ProjectDrawer({
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const [entered, setEntered] = useState(false);
+
+  // Compose the dossier once per Project id, not on every render while open.
+  const dossier = useMemo(
+    () => (projectId === null ? null : getProjectDossier(projectId)),
+    [projectId],
+  );
 
   // Slide-in: mount at translate-x-full, then flip on the next frame so the
   // transition runs. Reduced motion collapses the duration globally.
@@ -143,7 +151,8 @@ function DossierBody({
   onClose: () => void;
   closeRef: React.RefObject<HTMLButtonElement>;
 }) {
-  const { project, evm, discrepancies, actions, documents, flags } = dossier;
+  const { project, evm, discrepancies, actions, documents } = dossier;
+  const { flags } = project;
   const meta = [project.divisionName, project.owner ?? 'Unassigned', project.phase]
     .filter(Boolean)
     .join(' · ');
@@ -181,9 +190,15 @@ function DossierBody({
       {/* Body */}
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <dl className="mb-5 grid grid-cols-3 gap-3">
-          <Stat label="Budget (BAC)" value={formatCurrency(project.evm.bac, { compact: true })} />
-          <Stat label="% Complete" value={formatPercent(project.percentComplete)} />
-          <Stat label="Forecast EAC" value={formatCurrency(project.evm.eac, { compact: true })} />
+          <StatCard
+            label="Budget (BAC)"
+            value={formatCurrency(project.evm.bac, { compact: true })}
+          />
+          <StatCard label="% Complete" value={formatPercent(project.percentComplete)} />
+          <StatCard
+            label="Forecast EAC"
+            value={formatCurrency(project.evm.eac, { compact: true })}
+          />
         </dl>
 
         <Section title="Earned value">
@@ -211,7 +226,8 @@ function DossierBody({
                   <div className="min-w-0">
                     <p className="truncate text-[13px] font-medium text-ink">{d.field}</p>
                     <p className="truncate font-mono text-[11px] text-ink-muted">
-                      finance {d.financeValue ?? DASH} · pmo {d.pmoValue ?? DASH}
+                      finance {fieldValue(d.field, d.financeValue)} · pmo{' '}
+                      {fieldValue(d.field, d.pmoValue)}
                     </p>
                   </div>
                   <SeverityChip severity={d.severity} />
@@ -309,15 +325,6 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
       </h3>
       {children}
     </section>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-md border border-hairline bg-panel px-3 py-2">
-      <dt className="text-[11px] text-ink-muted">{label}</dt>
-      <dd className="mt-0.5 font-mono text-[13px] tabular-nums text-ink">{value}</dd>
-    </div>
   );
 }
 

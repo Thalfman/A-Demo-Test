@@ -11,7 +11,10 @@ import { useProjectDrawer } from './ProjectDrawerContext';
  *
  * Click is stopped from propagating so wrapping it inside an already-clickable
  * row (e.g. the EVM drill-down rows) opens the drawer instead of selecting the
- * row.
+ * row. Keyboard activation is stopped the same way: the row/card ancestors that
+ * host this link are keyboard-operable (their own `onKeyDown` fires the row
+ * action on Enter/Space), so the link must stop the key event from bubbling or a
+ * single keypress would both open the drawer and trigger the row.
  */
 export function ProjectLink({
   id,
@@ -24,6 +27,8 @@ export function ProjectLink({
 }) {
   const { open } = useProjectDrawer();
 
+  const stop = (e: { stopPropagation: () => void }) => e.stopPropagation();
+
   return (
     <button
       type="button"
@@ -31,6 +36,8 @@ export function ProjectLink({
         e.stopPropagation();
         open(id);
       }}
+      onKeyDown={stop}
+      onKeyUp={stop}
       className={`rounded-sm text-left underline decoration-dotted decoration-ink-faint underline-offset-2 transition-colors hover:text-ai hover:decoration-ai focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai ${className}`}
     >
       {children}

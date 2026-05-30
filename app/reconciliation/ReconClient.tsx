@@ -6,7 +6,7 @@ import { Card } from '@/components/Card';
 import { DataTable, type Column } from '@/components/DataTable';
 import { ProjectLink } from '@/components/project-drawer/ProjectLink';
 import { SeverityChip } from '@/components/SeverityChip';
-import { DASH, formatCurrency, formatDate, formatNumber } from '@/lib/format';
+import { fieldValue } from '@/lib/format';
 import { analyzeReconciliation } from '@/lib/reconcile';
 import type {
   Discrepancy,
@@ -42,7 +42,7 @@ const titleCase = (s: string): string =>
 
 /** Display a discrepancy value or export cell, picking currency/date/number
  *  formatting by field. Null/blank renders as an em dash. */
-function valueLabel(
+function fieldValue(
   field: keyof ReconRecord | string,
   v: string | number | null,
   opts: { money?: boolean; date?: boolean } = {},
@@ -164,7 +164,7 @@ function ExportTable({
                             : ''
                         }`}
                       >
-                        {valueLabel(f.key, rec[f.key], {
+                        {fieldValue(f.key, rec[f.key], {
                           money: f.money,
                           date: f.date,
                         })}
@@ -234,14 +234,14 @@ export function ReconClient({
       header: 'Finance value',
       align: 'right',
       sortValue: (d) => d.financeValue,
-      render: (d) => valueLabel(d.field, d.financeValue),
+      render: (d) => fieldValue(d.field, d.financeValue),
     },
     {
       key: 'pmo',
       header: 'PMO value',
       align: 'right',
       sortValue: (d) => d.pmoValue,
-      render: (d) => valueLabel(d.field, d.pmoValue),
+      render: (d) => fieldValue(d.field, d.pmoValue),
     },
     {
       key: 'delta',
