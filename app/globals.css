@@ -3,29 +3,167 @@
 @tailwind utilities;
 
 /*
- * Design tokens — the source of truth for color/shape across the app.
- * lib/tokens.ts mirrors these hex values for Recharts (charts can't read CSS
- * variables cleanly). Keep the two in sync when changing a token.
+ * Design tokens — the "Instrument" system, Motorola-flavored. THREE themes:
+ *   :root                 → Dim   (warm graphite mid-tone, the default identity)
+ *   [data-theme='dark']   → Dark  (near-black terminal)
+ *   [data-theme='light']  → Light (cool paper)
+ * The single accent (--ai) is Motorola blue, reserved for the AI/analyst layer
+ * and focus rings only — it never colors a data value.
+ *
+ * lib/tokens.ts mirrors these literal hex values per theme for Recharts (charts
+ * can't read CSS variables). globals.css is the source of truth — keep both in
+ * sync when changing a token.
  */
 :root {
-  --color-brand: #2563eb;
-  --color-brand-muted: #93c5fd;
+  /* canonical tokens — DIM (default): warm-neutral graphite */
+  --bg: #1c1e23;
+  --chrome: rgba(28, 30, 35, 0.82);
+  --panel: #24262c;
+  --panel-2: #2c2f36;
+  --hairline: #383b43;
+  --hairline-strong: #494d57;
+  --ink: #eaecef;
+  --ink-muted: #9da4b0;
+  --ink-faint: #6e7682;
+  --ai: #5c92fa;
+  --ai-tint: rgba(92, 146, 250, 0.15);
+  --ai-glow: rgba(92, 146, 250, 0.34);
+  --status-ontrack: #46c265;
+  --status-atrisk: #d6a035;
+  --status-offtrack: #f0566b;
+  --chart-1: #eaecef;
+  --chart-2: #7e879a;
+  --chart-grid: #2f333c;
+  --mismatch: rgba(240, 86, 107, 0.12);
 
-  --color-surface: #f8fafc;
-  --color-surface-raised: #ffffff;
-  --color-border: #e2e8f0;
+  /* shape + elevation */
+  --r-sm: 4px;
+  --r-md: 6px;
+  --radius: var(--r-md); /* keeps legacy `rounded-token` valid */
+  --elev-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.42);
 
-  --color-ink: #0f172a;
-  --color-ink-muted: #64748b;
+  /* legacy aliases → canonical tokens (declared once; inherit per theme) */
+  --color-brand: var(--ai);
+  --color-brand-muted: var(--ink-faint);
+  --color-surface: var(--bg);
+  --color-surface-raised: var(--panel);
+  --color-border: var(--hairline);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-status-ontrack: var(--status-ontrack);
+  --color-status-atrisk: var(--status-atrisk);
+  --color-status-offtrack: var(--status-offtrack);
+}
 
-  --color-status-ontrack: #16a34a;
-  --color-status-atrisk: #d97706;
-  --color-status-offtrack: #dc2626;
+[data-theme='dark'] {
+  --bg: #0b0e14;
+  --chrome: rgba(11, 14, 20, 0.82);
+  --panel: #11151f;
+  --panel-2: #161b27;
+  --hairline: #222a3a;
+  --hairline-strong: #313b52;
+  --ink: #e7ebf3;
+  --ink-muted: #8b94a7;
+  --ink-faint: #566073;
+  --ai: #5c92fa;
+  --ai-tint: rgba(92, 146, 250, 0.14);
+  --ai-glow: rgba(92, 146, 250, 0.32);
+  --status-ontrack: #3fb950;
+  --status-atrisk: #d6a035;
+  --status-offtrack: #f0566b;
+  --chart-1: #e7ebf3;
+  --chart-2: #6f7a91;
+  --chart-grid: #1e2533;
+  --mismatch: rgba(240, 86, 107, 0.11);
+  --elev-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
 
-  --radius: 0.5rem;
+[data-theme='light'] {
+  --bg: #f4f6fa;
+  --chrome: rgba(244, 246, 250, 0.82);
+  --panel: #ffffff;
+  --panel-2: #f5f7fb;
+  --hairline: #e2e6ee;
+  --hairline-strong: #cbd2df;
+  --ink: #0e1320;
+  --ink-muted: #5a6473;
+  --ink-faint: #8a93a2;
+  --ai: #005fbe;
+  --ai-tint: rgba(0, 95, 190, 0.08);
+  --ai-glow: rgba(0, 95, 190, 0.22);
+  --status-ontrack: #1f9d57;
+  --status-atrisk: #a86c12;
+  --status-offtrack: #c4374c;
+  --chart-1: #0e1320;
+  --chart-2: #7a8398;
+  --chart-grid: #e2e6ee;
+  --mismatch: rgba(196, 55, 76, 0.07);
+  --elev-inset: inset 0 1px 0 rgba(15, 19, 32, 0.03);
+  --shadow-pop: 0 8px 24px rgba(15, 19, 32, 0.12);
 }
 
 body {
-  background-color: var(--color-surface);
-  color: var(--color-ink);
+  background-color: var(--bg);
+  color: var(--ink);
+}
+
+@layer components {
+  /*
+   * Translucent status/AI chip tint. The instance sets `--tint` to a token
+   * (e.g. var(--status-offtrack)); color-mix derives the fill/border so it is
+   * theme-aware with zero JS and no hydration mismatch.
+   */
+  .tint-chip {
+    color: var(--tint);
+    background-color: color-mix(in srgb, var(--tint) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--tint) 36%, transparent);
+  }
+
+  /* Dotted authorship rule under AI panel headers (vs solid hairline on data). */
+  .ai-rule {
+    border-bottom: 1px dotted color-mix(in srgb, var(--ai) 45%, transparent);
+  }
+}
+
+@layer utilities {
+  /* The single AI tell: the analyst rail draws itself in on mount. */
+  .motion-rail {
+    transform-origin: top;
+    animation: ai-rail-draw 180ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  /* One-shot accent pulse on a freshly-targeted table row. */
+  .motion-pulse {
+    animation: ai-pulse 220ms cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+@keyframes ai-rail-draw {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes ai-pulse {
+  0% {
+    box-shadow: inset 2px 0 0 0 var(--ai), 0 0 0 1px var(--ai-glow);
+  }
+  100% {
+    box-shadow: inset 2px 0 0 0 transparent, 0 0 0 1px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
