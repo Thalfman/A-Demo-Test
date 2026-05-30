@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { ChartLegend, type LegendSeries } from '@/components/ChartLegend';
 import { ChartTooltip } from '@/components/ChartTooltip';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { useMountOnlyAnimation } from '@/hooks/useMountOnlyAnimation';
+import { useSeriesToggle } from '@/hooks/useSeriesToggle';
 import { formatNumber } from '@/lib/format';
 import { getChartColors } from '@/lib/tokens';
 import { ChartContainer } from './ChartContainer';
@@ -45,17 +46,9 @@ export function CategoryBarChart({
   valueFormatter?: (v: number) => string;
 }) {
   const { theme } = useTheme();
-  const c = getChartColors(theme);
+  const c = useMemo(() => getChartColors(theme), [theme]);
   const animate = useMountOnlyAnimation();
-  const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
-
-  const toggle = (key: string) =>
-    setHidden((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
+  const { hidden, toggle } = useSeriesToggle();
 
   const colorFor = (bar: BarSpec, i: number) =>
     bar.color ?? c.chartPalette[i % c.chartPalette.length];
@@ -89,6 +82,7 @@ export function CategoryBarChart({
               <ChartTooltip
                 colors={c}
                 valueFormatter={valueFormatter ?? formatNumber}
+                hiddenKeys={hidden}
               />
             }
           />

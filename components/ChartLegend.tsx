@@ -1,5 +1,7 @@
 'use client';
 
+import { SeriesSwatch } from '@/components/SeriesSwatch';
+
 export interface LegendSeries {
   key: string;
   name: string;
@@ -38,16 +40,7 @@ export function ChartLegend({
                 off ? 'text-ink-faint line-through' : 'text-ink-muted hover:text-ink'
               }`}
             >
-              <span
-                aria-hidden
-                className="inline-block h-2 w-3"
-                style={{
-                  backgroundColor: s.dashed ? 'transparent' : s.color,
-                  borderTop: s.dashed ? `2px dashed ${s.color}` : undefined,
-                  borderRadius: s.dashed ? 0 : 2,
-                  opacity: off ? 0.4 : 1,
-                }}
-              />
+              <SeriesSwatch color={s.color} dashed={s.dashed} dimmed={off} />
               {s.name}
             </button>
           </li>

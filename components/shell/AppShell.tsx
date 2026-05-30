@@ -6,14 +6,11 @@ import { useState, type ReactNode } from 'react';
 
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { formatRatio } from '@/lib/format';
+import type { PortfolioPulse } from '@/lib/portfolioPulse';
 import { NAV_ITEMS } from './nav-items';
 
-export interface Pulse {
-  projects: number;
-  offTrack: number;
-  cpi: number;
-  spi: number;
-}
+/** The header strip renders the same pulse the landing hero shows. */
+export type Pulse = PortfolioPulse;
 
 const strip = (p: string): string =>
   p !== '/' && p.endsWith('/') ? p.slice(0, -1) : p;

@@ -16,8 +16,12 @@ export interface LandingModule extends ModuleInfo {
  *  (client) rather than upstream so the count-up format functions never have to
  *  cross the server→client boundary. */
 function heroKpis(pulse: PortfolioPulse): HeroKpiItem[] {
+  // The count-up hook feeds fractional in-between values; integer KPIs round so
+  // they never flicker a decimal mid-animation. Ratios keep two decimals (a CPI
+  // counting up through 0.xx reads correctly).
+  const int = (n: number) => formatNumber(Math.round(n));
   return [
-    { label: 'Projects', value: pulse.projects, format: formatNumber },
+    { label: 'Projects', value: pulse.projects, format: int },
     {
       label: 'Portfolio CPI',
       value: pulse.cpi,
@@ -35,7 +39,7 @@ function heroKpis(pulse: PortfolioPulse): HeroKpiItem[] {
     {
       label: 'Off-track',
       value: pulse.offTrack,
-      format: formatNumber,
+      format: int,
       tone: pulse.offTrack > 0 ? 'negative' : 'neutral',
     },
   ];

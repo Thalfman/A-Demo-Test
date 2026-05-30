@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { ChartLegend, type LegendSeries } from '@/components/ChartLegend';
 import { ChartTooltip } from '@/components/ChartTooltip';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { useMountOnlyAnimation } from '@/hooks/useMountOnlyAnimation';
+import { useSeriesToggle } from '@/hooks/useSeriesToggle';
 import { formatCurrency } from '@/lib/format';
 import { getChartColors } from '@/lib/tokens';
 import type { EvmSeriesPoint } from '@/lib/types';
@@ -35,17 +36,9 @@ export function EvmLineChart({
   height?: number;
 }) {
   const { theme } = useTheme();
-  const c = getChartColors(theme);
+  const c = useMemo(() => getChartColors(theme), [theme]);
   const animate = useMountOnlyAnimation();
-  const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
-
-  const toggle = (key: string) =>
-    setHidden((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
+  const { hidden, toggle } = useSeriesToggle();
 
   const legend: LegendSeries[] = SERIES.map((s) => ({
     key: s.key,
@@ -76,6 +69,7 @@ export function EvmLineChart({
                 colors={c}
                 valueFormatter={(v) => formatCurrency(v)}
                 showEvmDelta
+                hiddenKeys={hidden}
               />
             }
           />

@@ -1,5 +1,6 @@
 'use client';
 
+import { SeriesSwatch } from '@/components/SeriesSwatch';
 import { evmVariance } from '@/lib/evmVariance';
 import { formatPercent } from '@/lib/format';
 import { radiusPx, type ChartColors } from '@/lib/tokens';
@@ -35,7 +36,9 @@ const hasEvmShape = (p: unknown): p is EvmSeriesPoint => {
  * the categorical bar charts read as one coherent toolset (PRD #9 §9). When
  * `showEvmDelta` is set and the hovered row is an EVM point, it appends the
  * earned-vs-planned schedule delta from the pure `evmVariance` helper (§7, §13),
- * keeping this a thin presentational layer over that math.
+ * keeping this a thin presentational layer over that math. `hiddenKeys` (the
+ * legend's toggled-off series) are dropped so the card never names a curve the
+ * viewer just hid — and the delta is suppressed when PV or EV is hidden.
  */
 export function ChartTooltip({
   active,
@@ -44,6 +47,7 @@ export function ChartTooltip({
   colors,
   valueFormatter,
   showEvmDelta = false,
+  hiddenKeys,
 }: {
   active?: boolean;
   label?: string | number;
@@ -51,12 +55,26 @@ export function ChartTooltip({
   colors: ChartColors;
   valueFormatter: (v: number) => string;
   showEvmDelta?: boolean;
+  hiddenKeys?: ReadonlySet<string>;
 }) {
-  if (!active || payload.length === 0) return null;
+  const visible = hiddenKeys
+    ? payload.filter((e) => !hiddenKeys.has(String(e.dataKey)))
+    : payload;
 
-  const point = (payload[0] as { payload?: Record<string, unknown> }).payload;
+  if (!active || visible.length === 0) return null;
+
+  const point = (visible[0] as { payload?: Record<string, unknown> }).payload;
+  const evmHidden = !!hiddenKeys && (hiddenKeys.has('pv') || hiddenKeys.has('ev'));
   const variance =
-    showEvmDelta && hasEvmShape(point) ? evmVariance(point) : null;
+    showEvmDelta && !evmHidden && hasEvmShape(point) ? evmVariance(point) : null;
+
+  const deltaTone =
+    variance == null || variance.scheduleVariance === 0
+      ? colors.tick
+      : variance.scheduleVariance < 0
+        ? colors.statusColors['Off Track']
+        : colors.statusColors['On Track'];
+  const sign = variance && variance.scheduleVariance > 0 ? '+' : '';
 
   return (
     <div
@@ -77,7 +95,7 @@ export function ChartTooltip({
         </p>
       ) : null}
       <ul className="space-y-1 px-3 py-2">
-        {payload.map((entry, i) => {
+        {visible.map((entry, i) => {
           const value = asNumber(entry.value);
           return (
             <li
@@ -85,11 +103,7 @@ export function ChartTooltip({
               className="flex items-center justify-between gap-4"
             >
               <span className="flex items-center gap-2">
-                <span
-                  aria-hidden
-                  className="inline-block h-2 w-2 rounded-[2px]"
-                  style={{ backgroundColor: entry.color }}
-                />
+                <SeriesSwatch color={entry.color ?? colors.tick} />
                 <span style={{ color: colors.tick }}>{entry.name}</span>
               </span>
               <span className="tabular-nums">
@@ -105,18 +119,9 @@ export function ChartTooltip({
           style={{ borderColor: colors.tooltipBorder, color: colors.tick }}
         >
           EV vs PV{' '}
-          <span
-            className="tabular-nums"
-            style={{
-              color:
-                variance.scheduleVariance < 0
-                  ? colors.statusColors['Off Track']
-                  : colors.statusColors['On Track'],
-            }}
-          >
-            {variance.scheduleVariance >= 0 ? '+' : ''}
-            {valueFormatter(variance.scheduleVariance)} (
-            {variance.earnedVsPlannedDelta >= 0 ? '+' : ''}
+          <span className="tabular-nums" style={{ color: deltaTone }}>
+            {sign}
+            {valueFormatter(variance.scheduleVariance)} ({sign}
             {formatPercent(variance.earnedVsPlannedDelta, 1)})
           </span>
         </p>
