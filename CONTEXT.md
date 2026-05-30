@@ -35,8 +35,21 @@ _Avoid_: task, todo, recommendation.
 
 **AI Artifact**:
 A precomputed, clearly-labeled AI output — briefing, narrative, summary, or
-document. Always rendered behind the blue analyst rail.
+document. Bundled with the build and therefore vetted. Always rendered behind
+the blue analyst rail.
 _Avoid_: insight, generated content.
+
+**Live Response**:
+AI output generated on demand by the user's own model (BYOK), in the current
+session — not precomputed, not vetted, may be wrong. A sibling of AI Artifact,
+not a kind of it: it carries the blue AI accent but a distinct `LIVE ·
+unverified` marker so it is never mistaken for a vetted Artifact.
+_Avoid_: AI artifact (a Live Response is not one), answer.
+
+**Live Analyst**:
+The chat surface that produces Live Responses, grounded in a precomputed
+context bundle built from the synthetic Portfolio.
+_Avoid_: assistant, copilot, bot.
 
 **Data-Quality Flag**:
 A record of one cleanup the normalizer applied to a raw Project field (missing,
