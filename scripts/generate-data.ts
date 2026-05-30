@@ -747,9 +747,9 @@ function reconSummary(discrepancies: Discrepancy[]): AiArtifact {
  *
  * Status reports and SOPs stay terse and figure-led. Meeting notes and decision
  * logs are written as substantial narrative artifacts: longer, well-structured
- * prose grounded in real project names, owners, programs, and forecast dates
- * pulled from the aggregate — deliberately light on hard EVM figures so a number
- * never drifts out of sync with the portfolio it summarizes.
+ * prose grounded in real project names, owners, and divisions pulled from the
+ * aggregate — deliberately light on hard figures and specific dates so nothing
+ * drifts out of sync with the committed portfolio it summarizes.
  * ------------------------------------------------------------------------- */
 
 function buildDocuments(a: Aggregates, discrepancyCount: number): DocumentsData {
@@ -895,10 +895,10 @@ function buildDocuments(a: Aggregates, discrepancyCount: number): DocumentsData 
         `The steering committee met on ${asOf} for its monthly portfolio review. The chair opened by noting that the portfolio of ${a.count} projects remains broadly deliverable, but that aggregate cost and schedule performance have both slipped below plan and the spread between the healthiest and weakest projects has widened since the last sitting. The committee agreed to spend the bulk of the session on the small number of projects dragging the roll-up rather than re-reviewing the projects already tracking to plan.`,
         '',
         '## Portfolio health discussion',
-        `Members accepted the headline picture without much debate: a majority of projects are on track, a handful sit at risk, and a small group is off track. The finance lead cautioned that the published roll-up still depends on which system you read it from, and that the reconciliation work remains a prerequisite for trusting any single aggregate figure. The committee asked that future health summaries lead with the reconciled view rather than either raw export.`,
+        `Members accepted the headline picture without much debate: the largest share of projects are on track, while a meaningful number sit at risk or off track. The finance lead cautioned that the published roll-up still depends on which system you read it from, and that the reconciliation work remains a prerequisite for trusting any single aggregate figure. The committee asked that future health summaries lead with the reconciled view rather than either raw export.`,
         '',
         '## Escalation — troubled project',
-        `Most of the discussion centred on ${troubled.name}, owned by ${troubled.owner} in the ${troubled.divisionName} division. The project is in its execution phase and is now both over cost and behind schedule; the current forecast has it finishing materially later than the committed end date. The owner attributed the slippage to scope that grew during execution and to integration effort that was underestimated at baseline. The committee was sympathetic to the root cause but firm that the project cannot continue against its original baseline, and directed that a formal recovery plan be brought to the next sitting.`,
+        `Most of the discussion centred on ${troubled.name}, owned by ${troubled.owner} in the ${troubled.divisionName} division. The project is in its execution phase and is now both over cost and behind schedule; the team has not yet been able to put a credible finish date against the work that remains. The owner attributed the slippage to scope that grew during execution and to integration effort that was underestimated at baseline. The committee was sympathetic to the root cause but firm that the project cannot continue against its original baseline, and directed that a formal recovery plan be brought to the next sitting.`,
         '',
         '## Watch list',
         `The committee also flagged ${watchList} as projects trending off plan that warrant attention before they become escalations in their own right. Owners were asked to confirm their estimates-at-completion and to surface any dependency or staffing risks early rather than waiting for the next monthly cycle.`,
@@ -930,7 +930,7 @@ function buildDocuments(a: Aggregates, discrepancyCount: number): DocumentsData 
         `Program management convened a working session on ${asOf} to turn the steering committee's escalation of ${troubled.name} into a concrete recovery path. ${troubled.owner}, the project owner, walked the group through the current state and the constraints on any recovery.`,
         '',
         '## Where it stands',
-        `The project sits in its execution phase within the ${troubled.divisionName} division. Both cost and schedule indices are below plan, and the latest forecast has delivery slipping past the committed date. The owner was candid that the original baseline no longer reflects the work remaining, and that continuing to report against it obscures rather than clarifies the true position.`,
+        `The project sits in its execution phase within the ${troubled.divisionName} division. Both cost and schedule indices are below plan, and the team has not yet been able to commit to a reliable finish date for the work that remains. The owner was candid that the original baseline no longer reflects the work remaining, and that continuing to report against it obscures rather than clarifies the true position.`,
         '',
         '## Why it slipped',
         'The group traced the variance to two compounding causes. First, scope expanded during execution without a corresponding baseline change, so the team has been delivering more than was costed. Second, the integration effort was underestimated at planning time, and that work has consistently taken longer than its earned value credited. The combination has meant burn outpacing earned value for several consecutive reporting periods rather than a single bad month.',
