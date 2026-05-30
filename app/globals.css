@@ -128,7 +128,9 @@ body {
 }
 
 @layer utilities {
-  /* The single AI tell: the analyst rail draws itself in on mount. */
+  /* Inside the modules, motion is the single AI tell: the analyst rail draws
+   * itself in on mount. The landing route is exempt and may use decorative
+   * motion (count-up, card stagger, sparkline draw) — see docs/adr/0002. */
   .motion-rail {
     transform-origin: top;
     animation: ai-rail-draw 180ms cubic-bezier(0.2, 0, 0, 1);
