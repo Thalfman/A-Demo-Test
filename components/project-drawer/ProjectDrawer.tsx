@@ -108,8 +108,6 @@ export function ProjectDrawer({
 
   if (!open || projectId === null) return null;
 
-  const dossier = getProjectDossier(projectId);
-
   return (
     <div className="fixed inset-0 z-[60]" role="presentation">
       {/* Backdrop */}

@@ -6,7 +6,7 @@ import { Card } from '@/components/Card';
 import { DataTable, type Column } from '@/components/DataTable';
 import { ProjectLink } from '@/components/project-drawer/ProjectLink';
 import { SeverityChip } from '@/components/SeverityChip';
-import { fieldValue } from '@/lib/format';
+import { DASH, fieldValue, formatCurrency, formatDate, formatNumber } from '@/lib/format';
 import { analyzeReconciliation } from '@/lib/reconcile';
 import type {
   Discrepancy,
@@ -39,25 +39,6 @@ const EXPORT_FIELDS: {
 
 const titleCase = (s: string): string =>
   s.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
-
-/** Display a discrepancy value or export cell, picking currency/date/number
- *  formatting by field. Null/blank renders as an em dash. */
-function fieldValue(
-  field: keyof ReconRecord | string,
-  v: string | number | null,
-  opts: { money?: boolean; date?: boolean } = {},
-): ReactNode {
-  if (v == null || v === '') return DASH;
-  if ((opts.date || field === 'endDate') && typeof v === 'string') {
-    return formatDate(v);
-  }
-  if (typeof v === 'number') {
-    return opts.money || field === 'budget' || field === 'actualCost'
-      ? formatCurrency(v)
-      : formatNumber(v);
-  }
-  return v;
-}
 
 const isMoneyField = (field: string) =>
   field === 'budget' || field === 'actualCost';
