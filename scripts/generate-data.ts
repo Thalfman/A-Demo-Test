@@ -743,10 +743,25 @@ function reconSummary(discrepancies: Discrepancy[]): AiArtifact {
 }
 
 /* ----------------------------------------------------------------------------
- * Documents (status reports + SOPs) — AI-generated
+ * Documents (status reports, SOPs, meeting notes, decision logs) — AI-generated.
+ *
+ * Status reports and SOPs stay terse and figure-led. Meeting notes and decision
+ * logs are written as substantial narrative artifacts: longer, well-structured
+ * prose grounded in real project names, owners, programs, and forecast dates
+ * pulled from the aggregate — deliberately light on hard EVM figures so a number
+ * never drifts out of sync with the portfolio it summarizes.
  * ------------------------------------------------------------------------- */
 
 function buildDocuments(a: Aggregates, discrepancyCount: number): DocumentsData {
+  const asOf = renderDate(NOW, 'long');
+  const troubled = a.troubled;
+  const watch = a.underperformers.filter((t) => !t.troubled).slice(0, 2);
+  const watchNames = watch.map((t) => t.name);
+  const watchList =
+    watchNames.length === 2
+      ? `${watchNames[0]} and ${watchNames[1]}`
+      : watchNames.join('');
+
   const statusReports: AppDocument[] = [
     {
       id: 'DOC-STATUS-001',
@@ -860,7 +875,156 @@ function buildDocuments(a: Aggregates, discrepancyCount: number): DocumentsData 
     },
   ];
 
-  return { statusReports, sops };
+  const meetingNotes: AppDocument[] = [
+    {
+      id: 'DOC-MEETING-001',
+      type: 'meeting-notes',
+      title: 'Portfolio Steering Committee — Monthly Review',
+      summary:
+        'Narrative minutes from the monthly steering review: health discussion, the troubled-project escalation, and agreed follow-ups.',
+      aiGenerated: true,
+      generatedAt: NOW,
+      meta: {
+        author: 'AI Meeting Scribe',
+        audience: 'Executive Steering',
+        effectiveDate: NOW,
+      },
+      tags: ['meeting', 'steering', 'portfolio'],
+      body: [
+        '## Context',
+        `The steering committee met on ${asOf} for its monthly portfolio review. The chair opened by noting that the portfolio of ${a.count} projects remains broadly deliverable, but that aggregate cost and schedule performance have both slipped below plan and the spread between the healthiest and weakest projects has widened since the last sitting. The committee agreed to spend the bulk of the session on the small number of projects dragging the roll-up rather than re-reviewing the projects already tracking to plan.`,
+        '',
+        '## Portfolio health discussion',
+        `Members accepted the headline picture without much debate: a majority of projects are on track, a handful sit at risk, and a small group is off track. The finance lead cautioned that the published roll-up still depends on which system you read it from, and that the reconciliation work remains a prerequisite for trusting any single aggregate figure. The committee asked that future health summaries lead with the reconciled view rather than either raw export.`,
+        '',
+        '## Escalation — troubled project',
+        `Most of the discussion centred on ${troubled.name}, owned by ${troubled.owner} in the ${troubled.divisionName} division. The project is in its execution phase and is now both over cost and behind schedule; the current forecast has it finishing materially later than the committed end date. The owner attributed the slippage to scope that grew during execution and to integration effort that was underestimated at baseline. The committee was sympathetic to the root cause but firm that the project cannot continue against its original baseline, and directed that a formal recovery plan be brought to the next sitting.`,
+        '',
+        '## Watch list',
+        `The committee also flagged ${watchList} as projects trending off plan that warrant attention before they become escalations in their own right. Owners were asked to confirm their estimates-at-completion and to surface any dependency or staffing risks early rather than waiting for the next monthly cycle.`,
+        '',
+        '## Decisions and follow-ups',
+        `- Commission a re-baseline and recovery plan for ${troubled.name}, to be reviewed at the next meeting.`,
+        '- Adopt the reconciled Finance/PMO figures as the basis for portfolio reporting going forward.',
+        `- ${watch[0]?.owner ?? 'Watch-list owners'} and peers to confirm EAC and flag emerging risks on the watch-list projects within the cycle.`,
+        '- Move to a weekly cost-actuals cadence so variance is caught between monthly reviews, not at them.',
+      ].join('\n'),
+    },
+    {
+      id: 'DOC-MEETING-002',
+      type: 'meeting-notes',
+      title: `Recovery Working Session — ${troubled.name}`,
+      summary:
+        'Notes from the deep-dive working session on the troubled project: where it stands, why it slipped, and the recovery options on the table.',
+      aiGenerated: true,
+      generatedAt: NOW,
+      meta: {
+        author: 'AI Meeting Scribe',
+        audience: 'Program Management',
+        relatedProjectId: troubled.id,
+        effectiveDate: NOW,
+      },
+      tags: ['meeting', 'recovery', 'deep-dive'],
+      body: [
+        '## Attendees and purpose',
+        `Program management convened a working session on ${asOf} to turn the steering committee's escalation of ${troubled.name} into a concrete recovery path. ${troubled.owner}, the project owner, walked the group through the current state and the constraints on any recovery.`,
+        '',
+        '## Where it stands',
+        `The project sits in its execution phase within the ${troubled.divisionName} division. Both cost and schedule indices are below plan, and the latest forecast has delivery slipping past the committed date. The owner was candid that the original baseline no longer reflects the work remaining, and that continuing to report against it obscures rather than clarifies the true position.`,
+        '',
+        '## Why it slipped',
+        'The group traced the variance to two compounding causes. First, scope expanded during execution without a corresponding baseline change, so the team has been delivering more than was costed. Second, the integration effort was underestimated at planning time, and that work has consistently taken longer than its earned value credited. The combination has meant burn outpacing earned value for several consecutive reporting periods rather than a single bad month.',
+        '',
+        '## Options discussed',
+        '1. Re-baseline the scope and defer non-critical features so the remaining plan is achievable and honestly costed.',
+        '2. Add a senior delivery lead specifically to unblock the integration work, which the group saw as the critical path.',
+        '3. Institute monthly estimate-at-completion reviews until cost performance recovers and holds above threshold.',
+        '',
+        '## Working agreement',
+        `The session did not pick a single option to the exclusion of the others; the sense of the room was that the re-baseline is non-negotiable and that the staffing and review measures should run alongside it. ${troubled.owner} agreed to draft the re-baselined plan for program management to review before it goes back to steering.`,
+      ].join('\n'),
+    },
+  ];
+
+  const decisionLogs: AppDocument[] = [
+    {
+      id: 'DOC-DECISION-001',
+      type: 'decision-log',
+      title: `Decision — Re-baseline ${troubled.name}`,
+      summary:
+        'Decision record capturing the choice to re-baseline the troubled project, the options weighed, and the rationale.',
+      aiGenerated: true,
+      generatedAt: NOW,
+      meta: {
+        author: 'AI Decision Recorder',
+        audience: 'Program Management',
+        relatedProjectId: troubled.id,
+        version: '1.0',
+        effectiveDate: NOW,
+      },
+      tags: ['decision', 'recovery', 'governance'],
+      body: [
+        '## Decision',
+        `Program management has decided to formally re-baseline ${troubled.name} rather than continue tracking it against its original plan or cancel it outright. The re-baseline will reset scope, schedule, and budget to reflect the work genuinely remaining, and will become the project's basis of record from this point.`,
+        '',
+        '## Status',
+        `Accepted, effective ${asOf}. Owned by ${troubled.owner} in the ${troubled.divisionName} division.`,
+        '',
+        '## Context',
+        'The project has run over cost and behind schedule for several consecutive periods, driven by scope that grew during execution and by integration effort underestimated at baseline. Reporting against a baseline everyone agrees is obsolete was producing variance figures that described the past rather than guiding the recovery.',
+        '',
+        '## Options considered',
+        '- **Hold the current baseline.** Rejected: it understates the remaining work and makes the variance figures actively misleading.',
+        '- **Cancel the project.** Rejected: the delivered scope retains clear value and the underlying need has not gone away.',
+        '- **Re-baseline scope, schedule, and budget.** Chosen: it restores an honest plan to measure against and pairs naturally with the staffing and review measures already proposed.',
+        '',
+        '## Rationale',
+        'Re-baselining was the only option that let the team measure recovery against a plan they believe in. It also gives steering a defensible reference point for judging whether corrective action is working, instead of a baseline that guarantees red variance regardless of effort.',
+        '',
+        '## Consequences',
+        'The re-baselined plan must be drafted, reviewed by program management, and ratified by steering before it takes effect. Historical variance against the old baseline is retained for audit but will no longer drive status. The project moves to a monthly estimate-at-completion review until performance recovers and holds.',
+      ].join('\n'),
+    },
+    {
+      id: 'DOC-DECISION-002',
+      type: 'decision-log',
+      title: 'Decision — Reconciled Figures as the Reporting Basis',
+      summary:
+        'Decision record adopting the reconciled Finance/PMO dataset as the single basis for portfolio reporting.',
+      aiGenerated: true,
+      generatedAt: NOW,
+      meta: {
+        author: 'AI Decision Recorder',
+        audience: 'PMO Analysts',
+        version: '1.0',
+        effectiveDate: NOW,
+      },
+      tags: ['decision', 'reconciliation', 'data-quality'],
+      body: [
+        '## Decision',
+        'Portfolio reporting will be based on the reconciled Finance and PMO dataset, not on either source export taken alone. No portfolio-level figure should be published until the two systems have been reconciled for the period in question.',
+        '',
+        '## Status',
+        `Accepted, effective ${asOf}. Owned by the PMO analytics function.`,
+        '',
+        '## Context',
+        `The two source systems disagree on a meaningful number of points each period — the most recent reconciliation surfaced ${discrepancyCount} discrepancies, including records that exist on only one side and at least one duplicate in the PMO tracker. Any roll-up built on a single export therefore carries errors that are invisible at the aggregate level but change the portfolio picture.`,
+        '',
+        '## Options considered',
+        '- **Report from the Finance export.** Rejected: it omits records the PMO tracks and lags on status changes.',
+        '- **Report from the PMO export.** Rejected: it carries duplicates and diverges from the financial system of record on budget.',
+        '- **Reconcile first, then report.** Chosen: only the reconciled set reflects both the financial truth and the delivery truth.',
+        '',
+        '## Rationale',
+        'Neither export is wrong so much as incomplete, and the gaps do not cancel out. Reconciling before publishing is the only approach that prevents a confident-looking aggregate from being quietly built on missing or double-counted rows.',
+        '',
+        '## Consequences',
+        'Reconciliation becomes a gating step in the reporting cycle rather than an optional clean-up. High-severity discrepancies must be resolved before publication, and the reconciled set is recorded as the period of record so downstream reports trace back to a single, agreed basis.',
+      ].join('\n'),
+    },
+  ];
+
+  return { statusReports, sops, meetingNotes, decisionLogs };
 }
 
 /* ----------------------------------------------------------------------------
@@ -944,10 +1108,10 @@ function main(): void {
     },
     {
       id: 'documents',
-      title: 'Status & SOP Library',
+      title: 'Document Library',
       route: '/documents',
       dataFile: 'data/documents.json',
-      summary: 'Finished executive status reports and SOPs.',
+      summary: 'Status reports, SOPs, meeting notes, and decision logs.',
     },
   ];
   const meta: Meta = {
@@ -959,6 +1123,8 @@ function main(): void {
       projects: truth.length,
       statusReports: documents.statusReports.length,
       sops: documents.sops.length,
+      meetingNotes: documents.meetingNotes.length,
+      decisionLogs: documents.decisionLogs.length,
       discrepancies: discrepancies.length,
     },
     dataQuality: summary,

@@ -24,6 +24,8 @@
     "projects": 14,
     "statusReports": 2,
     "sops": 2,
+    "meetingNotes": 2,
+    "decisionLogs": 2,
     "discrepancies": 16
   },
   "dataQuality": {
@@ -62,10 +64,10 @@
     },
     {
       "id": "documents",
-      "title": "Status & SOP Library",
+      "title": "Document Library",
       "route": "/documents",
       "dataFile": "data/documents.json",
-      "summary": "Finished executive status reports and SOPs."
+      "summary": "Status reports, SOPs, meeting notes, and decision logs."
     }
   ]
 }

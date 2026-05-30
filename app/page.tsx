@@ -19,7 +19,12 @@ function readouts(pulse: PortfolioPulse): Record<string, string> {
     portfolio: `${meta.counts.projects} projects · ${pulse.offTrack} off-track`,
     evm: `CPI ${formatRatio(pulse.cpi)} ${pulse.cpi < 1 ? '▼' : '▲'} · SPI ${formatRatio(pulse.spi)}`,
     reconciliation: `${recon.discrepancies.length} discrepancies · ${highSeverity} high`,
-    documents: `${docs.statusReports.length} reports · ${docs.sops.length} SOPs`,
+    documents: `${
+      docs.statusReports.length +
+      docs.sops.length +
+      docs.meetingNotes.length +
+      docs.decisionLogs.length
+    } documents · 4 types`,
   };
 }
 

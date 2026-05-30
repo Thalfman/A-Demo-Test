@@ -223,7 +223,11 @@ export interface ReconciliationData {
  * Module 4 — Status & SOP Library
  * ------------------------------------------------------------------------- */
 
-export type DocumentType = 'status-report' | 'sop';
+export type DocumentType =
+  | 'status-report'
+  | 'sop'
+  | 'meeting-notes'
+  | 'decision-log';
 
 export interface DocumentMeta {
   author: string;
@@ -248,6 +252,8 @@ export interface AppDocument {
 export interface DocumentsData {
   statusReports: AppDocument[];
   sops: AppDocument[];
+  meetingNotes: AppDocument[];
+  decisionLogs: AppDocument[];
 }
 
 /* ----------------------------------------------------------------------------
@@ -277,6 +283,8 @@ export interface Meta {
     projects: number;
     statusReports: number;
     sops: number;
+    meetingNotes: number;
+    decisionLogs: number;
     discrepancies: number;
   };
   dataQuality: DataQualitySummary;
