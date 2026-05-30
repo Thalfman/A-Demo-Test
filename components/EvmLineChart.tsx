@@ -1,19 +1,14 @@
 'use client';
 
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { useState } from 'react';
+import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 
+import { ChartLegend, type LegendSeries } from '@/components/ChartLegend';
+import { ChartTooltip } from '@/components/ChartTooltip';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { useMountOnlyAnimation } from '@/hooks/useMountOnlyAnimation';
 import { formatCurrency } from '@/lib/format';
-import { getChartColors, radiusPx } from '@/lib/tokens';
+import { getChartColors } from '@/lib/tokens';
 import type { EvmSeriesPoint } from '@/lib/types';
 import { ChartContainer } from './ChartContainer';
 
@@ -27,7 +22,9 @@ const MONO = 'var(--font-mono)';
 
 /** PV / EV / AC cumulative curves over time. PV reads as a muted baseline, EV as
  *  full ink, AC as dashed status-red, so over/underrun is legible at a glance.
- *  Tolerates sparse series (some projects carry as few as two points). */
+ *  A clickable legend toggles individual curves; the tooltip shares the app's
+ *  custom card and surfaces the earned-vs-planned delta. Tolerates sparse series
+ *  (some projects carry as few as two points). */
 export function EvmLineChart({
   data,
   title,
@@ -40,51 +37,69 @@ export function EvmLineChart({
   const { theme } = useTheme();
   const c = getChartColors(theme);
   const animate = useMountOnlyAnimation();
+  const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
+
+  const toggle = (key: string) =>
+    setHidden((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+
+  const legend: LegendSeries[] = SERIES.map((s) => ({
+    key: s.key,
+    name: s.name,
+    color: c.evmSeriesColors[s.key],
+    dashed: s.key === 'ac',
+  }));
 
   return (
-    <ChartContainer title={title} height={height}>
-      <LineChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke={c.grid} />
-        <XAxis
-          dataKey="period"
-          tick={{ fontSize: 11, fill: c.tick, fontFamily: MONO }}
-          stroke={c.axis}
-        />
-        <YAxis
-          width={56}
-          tick={{ fontSize: 11, fill: c.tick, fontFamily: MONO }}
-          stroke={c.axis}
-          tickFormatter={(v: number) => formatCurrency(v, { compact: true })}
-        />
-        <Tooltip
-          formatter={(value: number, name) => [formatCurrency(value), name]}
-          contentStyle={{
-            fontSize: 12,
-            fontFamily: MONO,
-            borderRadius: radiusPx,
-            backgroundColor: c.tooltipBg,
-            border: `1px solid ${c.tooltipBorder}`,
-            color: c.tooltipText,
-          }}
-          labelStyle={{ color: c.tooltipText }}
-          itemStyle={{ color: c.tooltipText }}
-        />
-        <Legend wrapperStyle={{ fontSize: 12 }} />
-        {SERIES.map((s) => (
-          <Line
-            key={s.key}
-            type="monotone"
-            dataKey={s.key}
-            name={s.name}
-            stroke={c.evmSeriesColors[s.key]}
-            strokeWidth={2}
-            strokeDasharray={s.key === 'ac' ? '5 3' : undefined}
-            dot={{ r: 2 }}
-            activeDot={{ r: 4 }}
-            isAnimationActive={animate}
+    <div>
+      <ChartContainer title={title} height={height}>
+        <LineChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke={c.grid} />
+          <XAxis
+            dataKey="period"
+            tick={{ fontSize: 11, fill: c.tick, fontFamily: MONO }}
+            stroke={c.axis}
           />
-        ))}
-      </LineChart>
-    </ChartContainer>
+          <YAxis
+            width={56}
+            tick={{ fontSize: 11, fill: c.tick, fontFamily: MONO }}
+            stroke={c.axis}
+            tickFormatter={(v: number) => formatCurrency(v, { compact: true })}
+          />
+          <Tooltip
+            content={
+              <ChartTooltip
+                colors={c}
+                valueFormatter={(v) => formatCurrency(v)}
+                showEvmDelta
+              />
+            }
+          />
+          {SERIES.map((s, i) => (
+            <Line
+              key={s.key}
+              type="monotone"
+              dataKey={s.key}
+              name={s.name}
+              hide={hidden.has(s.key)}
+              stroke={c.evmSeriesColors[s.key]}
+              strokeWidth={2}
+              strokeDasharray={s.key === 'ac' ? '5 3' : undefined}
+              dot={{ r: 2 }}
+              activeDot={{ r: 4 }}
+              isAnimationActive={animate}
+              animationDuration={900}
+              animationBegin={i * 140}
+              animationEasing="ease-out"
+            />
+          ))}
+        </LineChart>
+      </ChartContainer>
+      <ChartLegend series={legend} hidden={hidden} onToggle={toggle} />
+    </div>
   );
 }

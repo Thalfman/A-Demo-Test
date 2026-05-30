@@ -139,6 +139,13 @@ body {
   .motion-pulse {
     animation: ai-pulse 220ms cubic-bezier(0.2, 0, 0, 1);
   }
+  /* Landing-only (ADR-0002): cards rise + fade in on mount, staggered by an
+   * inline animation-delay. Pure CSS so it runs without JS and never causes a
+   * hydration mismatch. Disabled wholesale under reduced motion below, so the
+   * per-card delay can't leave a card briefly invisible. */
+  .landing-reveal {
+    animation: landing-rise 420ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
 }
 
 @keyframes ai-rail-draw {
@@ -159,6 +166,17 @@ body {
   }
 }
 
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -167,5 +185,10 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+  /* Drop the reveal entirely (not just shorten it) so the staggered delay can't
+   * hold a card at its 0-opacity start state — it resolves instantly. */
+  .landing-reveal {
+    animation: none !important;
   }
 }
