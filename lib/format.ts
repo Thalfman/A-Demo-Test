@@ -69,6 +69,28 @@ export function formatDate(
   return `${months[m - 1]} ${d}, ${y}`;
 }
 
+/**
+ * Format a reconciliation field value, picking currency / date / number by the
+ * field name (and optional hints). Null/blank render as an em dash. Shared so the
+ * Reconciliation table and the Project drawer render the same value identically.
+ */
+export function fieldValue(
+  field: string,
+  v: string | number | null,
+  opts: { money?: boolean; date?: boolean } = {},
+): string {
+  if (v == null || v === '') return DASH;
+  if ((opts.date || field === 'endDate') && typeof v === 'string') {
+    return formatDate(v);
+  }
+  if (typeof v === 'number') {
+    return opts.money || field === 'budget' || field === 'actualCost'
+      ? formatCurrency(v)
+      : formatNumber(v);
+  }
+  return v;
+}
+
 /** CSS variable reference for a status color (pairs with globals.css/tailwind). */
 export function statusToColorToken(status: ProjectStatus): string {
   const map: Record<ProjectStatus, string> = {

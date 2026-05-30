@@ -4,8 +4,9 @@ import { useMemo, useState, type ReactNode } from 'react';
 
 import { Card } from '@/components/Card';
 import { DataTable, type Column } from '@/components/DataTable';
+import { ProjectLink } from '@/components/project-drawer/ProjectLink';
 import { SeverityChip } from '@/components/SeverityChip';
-import { DASH, formatCurrency, formatDate, formatNumber } from '@/lib/format';
+import { DASH, fieldValue, formatCurrency, formatDate, formatNumber } from '@/lib/format';
 import { analyzeReconciliation } from '@/lib/reconcile';
 import type {
   Discrepancy,
@@ -38,25 +39,6 @@ const EXPORT_FIELDS: {
 
 const titleCase = (s: string): string =>
   s.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
-
-/** Display a discrepancy value or export cell, picking currency/date/number
- *  formatting by field. Null/blank renders as an em dash. */
-function valueLabel(
-  field: keyof ReconRecord | string,
-  v: string | number | null,
-  opts: { money?: boolean; date?: boolean } = {},
-): ReactNode {
-  if (v == null || v === '') return DASH;
-  if ((opts.date || field === 'endDate') && typeof v === 'string') {
-    return formatDate(v);
-  }
-  if (typeof v === 'number') {
-    return opts.money || field === 'budget' || field === 'actualCost'
-      ? formatCurrency(v)
-      : formatNumber(v);
-  }
-  return v;
-}
 
 const isMoneyField = (field: string) =>
   field === 'budget' || field === 'actualCost';
@@ -146,7 +128,9 @@ function ExportTable({
                   }`}
                 >
                   <td className="whitespace-nowrap px-3 py-2">
-                    <span className="font-medium">{rec.name}</span>
+                    <span className="font-medium">
+                      <ProjectLink id={rec.projectId}>{rec.name}</ProjectLink>
+                    </span>
                     {onlyHere ? <CountTag>{missingLabel}</CountTag> : null}
                     {dup ? <CountTag>duplicate</CountTag> : null}
                   </td>
@@ -161,7 +145,7 @@ function ExportTable({
                             : ''
                         }`}
                       >
-                        {valueLabel(f.key, rec[f.key], {
+                        {fieldValue(f.key, rec[f.key], {
                           money: f.money,
                           date: f.date,
                         })}
@@ -211,7 +195,9 @@ export function ReconClient({
             className="absolute -left-3 h-4 w-[3px] rounded-full"
             style={{ backgroundColor: SEVERITY_COLOR[d.severity] }}
           />
-          <span className="font-medium">{d.name}</span>
+          <span className="font-medium">
+            <ProjectLink id={d.projectId}>{d.name}</ProjectLink>
+          </span>
         </span>
       ),
     },
@@ -229,14 +215,14 @@ export function ReconClient({
       header: 'Finance value',
       align: 'right',
       sortValue: (d) => d.financeValue,
-      render: (d) => valueLabel(d.field, d.financeValue),
+      render: (d) => fieldValue(d.field, d.financeValue),
     },
     {
       key: 'pmo',
       header: 'PMO value',
       align: 'right',
       sortValue: (d) => d.pmoValue,
-      render: (d) => valueLabel(d.field, d.pmoValue),
+      render: (d) => fieldValue(d.field, d.pmoValue),
     },
     {
       key: 'delta',
