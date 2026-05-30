@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "npx serve out",
     "lint": "next lint",
+    "test": "vitest run",
     "generate:data": "tsx scripts/generate-data.ts"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.6",
     "tsx": "^4.16.2",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "vitest": "^2.1.9"
   }
 }
