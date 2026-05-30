@@ -23,7 +23,7 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
       nodes.push(
         <code
           key={`${keyBase}-c${i}`}
-          className="rounded bg-surface px-1 py-0.5 text-[0.85em]"
+          className="rounded-sm bg-panel-2 px-1 py-0.5 font-mono text-[0.85em]"
         >
           {match[2]}
         </code>,
@@ -61,7 +61,7 @@ function renderMarkdown(body: string): ReactNode[] {
       const level = heading[1].length;
       const cls =
         level <= 2
-          ? 'mt-5 first:mt-0 text-xs font-semibold uppercase tracking-wide text-ink-muted'
+          ? 'mt-6 first:mt-0 border-b border-hairline pb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted'
           : 'mt-4 text-base font-semibold';
       blocks.push(
         <p key={key} className={cls}>
@@ -80,7 +80,7 @@ function renderMarkdown(body: string): ReactNode[] {
         i += 1;
       }
       blocks.push(
-        <ul key={key} className="mt-2 list-disc space-y-1 pl-5 text-sm">
+        <ul key={key} className="mt-2 list-disc space-y-1 pl-5 text-[15px]">
           {items.map((it, idx) => (
             <li key={idx}>{renderInline(it, `ul${key}-${idx}`)}</li>
           ))}
@@ -97,7 +97,7 @@ function renderMarkdown(body: string): ReactNode[] {
         i += 1;
       }
       blocks.push(
-        <ol key={key} className="mt-2 list-decimal space-y-1 pl-5 text-sm">
+        <ol key={key} className="mt-2 list-decimal space-y-1 pl-5 text-[15px]">
           {items.map((it, idx) => (
             <li key={idx}>{renderInline(it, `ol${key}-${idx}`)}</li>
           ))}
@@ -119,7 +119,7 @@ function renderMarkdown(body: string): ReactNode[] {
       i += 1;
     }
     blocks.push(
-      <p key={key} className="mt-2 text-sm leading-relaxed">
+      <p key={key} className="mt-2 text-[15px] leading-relaxed">
         {renderInline(para.join(' '), `p${key}`)}
       </p>,
     );
@@ -144,7 +144,7 @@ export function DocumentViewer({ doc }: { doc: AppDocument }) {
   const { meta } = doc;
   return (
     <article>
-      <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
+      <header className="flex flex-wrap items-start justify-between gap-3 border-b border-hairline pb-4">
         <div>
           <h2 className="text-lg font-semibold">{doc.title}</h2>
           <p className="mt-1 max-w-prose text-sm text-ink-muted">{doc.summary}</p>
@@ -164,14 +164,14 @@ export function DocumentViewer({ doc }: { doc: AppDocument }) {
         ) : null}
       </dl>
 
-      <div className="mt-4">{renderMarkdown(doc.body)}</div>
+      <div className="mt-4 max-w-[68ch]">{renderMarkdown(doc.body)}</div>
 
       {doc.tags.length > 0 ? (
-        <div className="mt-5 flex flex-wrap gap-1.5 border-t border-border pt-3">
+        <div className="mt-5 flex flex-wrap gap-1.5 border-t border-hairline pt-3">
           {doc.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-surface px-2 py-0.5 text-xs text-ink-muted"
+              className="rounded-sm bg-panel-2 px-2 py-0.5 font-mono text-xs text-ink-muted"
             >
               #{tag}
             </span>

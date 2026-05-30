@@ -8,10 +8,13 @@ import { Card } from '@/components/Card';
 import { DataQualityChip } from '@/components/DataQualityChip';
 import { DataTable, type Column } from '@/components/DataTable';
 import { FilterBar, type FilterDef } from '@/components/FilterBar';
-import { StatCard, type StatTone } from '@/components/StatCard';
+import { KpiStrip, type KpiItem, type KpiTone } from '@/components/KpiStrip';
+import { SegmentedControl } from '@/components/SegmentedControl';
 import { StatusBadge } from '@/components/StatusBadge';
-import { formatCurrency, formatPercent, formatRatio } from '@/lib/format';
-import { statusColors } from '@/lib/tokens';
+import { Trackbar } from '@/components/Trackbar';
+import { useTheme } from '@/components/theme/ThemeProvider';
+import { formatCurrency, formatRatio } from '@/lib/format';
+import { getChartColors } from '@/lib/tokens';
 import {
   PROJECT_PHASES,
   PROJECT_STATUSES,
@@ -27,8 +30,16 @@ const STATUS_RANK: Record<Project['status'], number> = {
   'On Track': 0,
 };
 
-const ratioTone = (v: number): StatTone =>
+const ratioTone = (v: number): KpiTone =>
   v >= 1 ? 'positive' : v >= 0.95 ? 'neutral' : 'negative';
+
+/** Off-nominal coloring for an index in a table cell: ink when healthy, status
+ *  tint only when it crosses the conventional thresholds. */
+function ratioClass(v: number): string | undefined {
+  if (v >= 1) return undefined;
+  if (v >= 0.9) return 'text-status-atrisk';
+  return 'text-status-offtrack';
+}
 
 export function PortfolioClient({
   projects,
@@ -43,6 +54,9 @@ export function PortfolioClient({
   divisions: Division[];
   flaggedFields: number;
 }) {
+  const { theme } = useTheme();
+  const chart = getChartColors(theme);
+
   const [filters, setFilters] = useState<Record<string, string>>({
     division: '',
     status: '',
@@ -72,7 +86,7 @@ export function PortfolioClient({
     status,
     count: filtered.filter((p) => p.status === status).length,
   }));
-  const statusColorsByCell = PROJECT_STATUSES.map((s) => statusColors[s]);
+  const statusColorsByCell = PROJECT_STATUSES.map((s) => chart.statusColors[s]);
 
   const divisionData = divisions.map((d) => ({
     division: d.name,
@@ -81,16 +95,37 @@ export function PortfolioClient({
       .reduce((sum, p) => sum + p.evm.bac, 0),
   }));
 
-  const filterDefs: FilterDef[] = [
+  const kpis: KpiItem[] = [
+    { label: 'Projects', countTo: filtered.length, hint: ofAll },
+    {
+      label: 'Total BAC',
+      value: formatCurrency(totalBac, { compact: true }),
+      hint: 'budget at completion',
+    },
+    {
+      label: 'Off Track',
+      countTo: offTrack,
+      tone: offTrack > 0 ? 'negative' : 'positive',
+    },
+    {
+      label: 'Portfolio CPI',
+      value: formatRatio(portfolioMetrics.cpi),
+      tone: ratioTone(portfolioMetrics.cpi),
+      hint: 'portfolio-wide',
+    },
+    {
+      label: 'Portfolio SPI',
+      value: formatRatio(portfolioMetrics.spi),
+      tone: ratioTone(portfolioMetrics.spi),
+      hint: 'portfolio-wide',
+    },
+  ];
+
+  const divisionPhaseFilters: FilterDef[] = [
     {
       key: 'division',
       label: 'Division',
       options: divisions.map((d) => ({ value: d.id, label: d.name })),
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      options: PROJECT_STATUSES.map((s) => ({ value: s, label: s })),
     },
     {
       key: 'phase',
@@ -105,11 +140,22 @@ export function PortfolioClient({
       header: 'Project',
       sortValue: (p) => p.name,
       render: (p) => (
-        <span className="font-medium">
-          {p.name}
-          {p.isStale ? (
-            <span className="ml-2 text-xs font-normal text-ink-muted">stale</span>
+        <span className="relative flex items-center">
+          {p.flags.length > 0 ? (
+            <span
+              aria-hidden
+              className="absolute -left-3 h-4 w-0.5 rounded-full bg-ink-faint"
+              title={`${p.flags.length} data-quality flag${p.flags.length > 1 ? 's' : ''}`}
+            />
           ) : null}
+          <span className="font-medium">
+            {p.name}
+            {p.isStale ? (
+              <span className="ml-2 font-mono text-[11px] font-normal text-ink-muted">
+                stale
+              </span>
+            ) : null}
+          </span>
         </span>
       ),
     },
@@ -132,7 +178,7 @@ export function PortfolioClient({
       header: '% Complete',
       align: 'right',
       sortValue: (p) => p.percentComplete,
-      render: (p) => formatPercent(p.percentComplete),
+      render: (p) => <Trackbar value={p.percentComplete} />,
     },
     {
       key: 'bac',
@@ -146,7 +192,7 @@ export function PortfolioClient({
       header: 'CPI',
       align: 'right',
       sortValue: (p) => p.evm.cpi,
-      render: (p) => formatRatio(p.evm.cpi),
+      render: (p) => <span className={ratioClass(p.evm.cpi)}>{formatRatio(p.evm.cpi)}</span>,
     },
     {
       key: 'dataQuality',
@@ -158,42 +204,10 @@ export function PortfolioClient({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <AICallout artifact={aiBriefing} />
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <StatCard label="Projects" value={filtered.length} hint={ofAll} />
-        <StatCard
-          label="Total BAC"
-          value={formatCurrency(totalBac, { compact: true })}
-          hint="budget at completion"
-        />
-        <StatCard
-          label="Off Track"
-          value={offTrack}
-          tone={offTrack > 0 ? 'negative' : 'positive'}
-        />
-        <StatCard
-          label="Portfolio CPI"
-          value={formatRatio(portfolioMetrics.cpi)}
-          tone={ratioTone(portfolioMetrics.cpi)}
-          hint="portfolio-wide"
-        />
-        <StatCard
-          label="Portfolio SPI"
-          value={formatRatio(portfolioMetrics.spi)}
-          tone={ratioTone(portfolioMetrics.spi)}
-          hint="portfolio-wide"
-        />
-      </div>
-
-      <Card>
-        <FilterBar filters={filterDefs} values={filters} onChange={onChange} />
-        <p className="mt-3 text-xs text-ink-muted">
-          {flaggedFields} data-quality flags normalized on load across{' '}
-          {projects.length} projects. Per-row detail in the Data quality column.
-        </p>
-      </Card>
+      <KpiStrip items={kpis} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="Status distribution">
@@ -216,7 +230,33 @@ export function PortfolioClient({
         </Card>
       </div>
 
-      <Card title={`Projects (${filtered.length})`} bodyClassName="p-0">
+      <section className="rounded-md border border-hairline bg-panel shadow-elev">
+        <div className="flex flex-wrap items-end gap-x-4 gap-y-3 border-b border-hairline px-4 py-3">
+          <h3 className="mr-1 self-center text-[13px] font-semibold uppercase tracking-[0.06em] text-ink">
+            Projects
+          </h3>
+          <div className="flex flex-col gap-1 self-center">
+            <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-ink-muted">
+              Status
+            </span>
+            <SegmentedControl
+              ariaLabel="Filter by status"
+              value={filters.status}
+              onChange={(v) => onChange('status', v)}
+              allOption={{ value: '', label: 'All' }}
+              options={PROJECT_STATUSES.map((s) => ({ value: s, label: s }))}
+            />
+          </div>
+          <FilterBar
+            filters={divisionPhaseFilters}
+            values={filters}
+            onChange={onChange}
+          />
+          <span className="ml-auto self-center font-mono text-xs text-ink-muted">
+            {filtered.length} of {projects.length}
+            <span className="ml-3 text-ink-faint">{flaggedFields} flags normalized</span>
+          </span>
+        </div>
         <DataTable<Project>
           columns={columns}
           rows={filtered}
@@ -224,7 +264,7 @@ export function PortfolioClient({
           initialSort={{ key: 'status', dir: 'desc' }}
           emptyMessage="No projects match these filters."
         />
-      </Card>
+      </section>
     </div>
   );
 }

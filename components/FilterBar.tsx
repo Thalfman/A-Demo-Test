@@ -27,12 +27,14 @@ export function FilterBar({
   return (
     <div className="flex flex-wrap items-end gap-3">
       {filters.map((filter) => (
-        <label key={filter.key} className="flex flex-col gap-1 text-xs">
-          <span className="font-medium text-ink-muted">{filter.label}</span>
+        <label key={filter.key} className="flex flex-col gap-1 text-[11px]">
+          <span className="font-medium uppercase tracking-[0.08em] text-ink-muted">
+            {filter.label}
+          </span>
           <select
             value={values[filter.key] ?? ''}
             onChange={(e) => onChange(filter.key, e.target.value)}
-            className="min-w-[10rem] rounded-token border border-border bg-surface-raised px-2 py-1.5 text-sm text-ink focus:border-brand focus:outline-none"
+            className="min-w-[9rem] rounded-sm border border-hairline bg-panel px-2 py-1.5 text-sm text-ink transition-colors duration-state focus:border-ai focus:outline-none focus-visible:ring-2 focus-visible:ring-ai"
           >
             <option value="">{filter.allLabel ?? 'All'}</option>
             {filter.options.map((opt) => (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { DASH } from '@/lib/format';
 
@@ -46,7 +46,8 @@ function defaultCell<T>(col: Column<T>, row: T): ReactNode {
 }
 
 /** Generic, sortable, null-safe table. Clicking a sortable header toggles
- *  asc/desc; missing values always sort last and render as an em dash. */
+ *  asc/desc; missing values always sort last and render as an em dash. Numeric
+ *  (right-aligned) cells render in tabular mono so columns align to the digit. */
 export function DataTable<T>({
   columns,
   rows,
@@ -54,6 +55,7 @@ export function DataTable<T>({
   getRowKey,
   onRowClick,
   isRowActive,
+  pulseRowKey,
   emptyMessage = 'No matching rows.',
 }: {
   columns: Column<T>[];
@@ -62,9 +64,19 @@ export function DataTable<T>({
   getRowKey?: (row: T, index: number) => string;
   onRowClick?: (row: T) => void;
   isRowActive?: (row: T) => boolean;
+  /** Row key to flash once (accent left-border pulse) — e.g. the EVM selection. */
+  pulseRowKey?: string | null;
   emptyMessage?: string;
 }) {
   const [sort, setSort] = useState<SortState | undefined>(initialSort);
+  const [pulsing, setPulsing] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (pulseRowKey == null) return;
+    setPulsing(pulseRowKey);
+    const t = setTimeout(() => setPulsing(null), 260);
+    return () => clearTimeout(t);
+  }, [pulseRowKey]);
 
   const sortedRows = useMemo(() => {
     if (!sort) return rows;
@@ -98,7 +110,7 @@ export function DataTable<T>({
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
-          <tr className="border-b border-border">
+          <tr className="border-b-2 border-hairline-strong bg-panel-2">
             {columns.map((col) => {
               const sortable = Boolean(col.sortValue);
               const active = sort?.key === col.key;
@@ -118,7 +130,7 @@ export function DataTable<T>({
                         : 'descending'
                       : undefined
                   }
-                  className={`whitespace-nowrap px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink-muted ${
+                  className={`whitespace-nowrap px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted ${
                     alignClass[col.align ?? 'left']
                   } ${col.headerClassName ?? ''}`}
                 >
@@ -126,10 +138,10 @@ export function DataTable<T>({
                     <button
                       type="button"
                       onClick={() => toggleSort(col)}
-                      className="inline-flex items-center gap-1 select-none rounded text-inherit hover:text-ink focus:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                      className="inline-flex select-none items-center gap-1 rounded-sm text-inherit transition-colors duration-state hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ai"
                     >
                       {col.header}
-                      <span className="text-[0.65rem] text-ink-muted">
+                      <span className={`text-[0.65rem] ${active ? 'text-ai' : 'text-ink-faint'}`}>
                         {indicator}
                       </span>
                     </button>
@@ -155,11 +167,13 @@ export function DataTable<T>({
             </tr>
           ) : (
             sortedRows.map((row, index) => {
+              const rowKey = getRowKey ? getRowKey(row, index) : String(index);
               const active = isRowActive?.(row) ?? false;
               const clickable = Boolean(onRowClick);
+              const isPulsing = pulsing != null && pulsing === rowKey;
               return (
                 <tr
-                  key={getRowKey ? getRowKey(row, index) : index}
+                  key={rowKey}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
                   onKeyDown={
                     onRowClick
@@ -173,18 +187,22 @@ export function DataTable<T>({
                   }
                   tabIndex={clickable ? 0 : undefined}
                   aria-selected={clickable ? active : undefined}
-                  className={`border-b border-border last:border-0 ${
+                  className={`border-b border-hairline last:border-0 ${
+                    isPulsing ? 'motion-pulse' : ''
+                  } ${
                     clickable
-                      ? 'cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-brand'
+                      ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ai'
                       : ''
-                  } ${active ? 'bg-surface' : clickable ? 'hover:bg-surface' : ''}`}
+                  } ${active ? 'bg-panel-2' : clickable ? 'hover:bg-panel-2' : ''}`}
                 >
                   {columns.map((col) => (
                     <td
                       key={col.key}
                       className={`px-3 py-2 align-middle ${
                         alignClass[col.align ?? 'left']
-                      } ${col.cellClassName ?? ''}`}
+                      } ${col.align === 'right' ? 'font-mono tabular-nums' : ''} ${
+                        col.cellClassName ?? ''
+                      }`}
                     >
                       {defaultCell(col, row)}
                     </td>

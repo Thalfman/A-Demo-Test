@@ -16,7 +16,11 @@ export function ChartContainer({
 }) {
   return (
     <div>
-      {title ? <p className="mb-2 text-sm font-medium">{title}</p> : null}
+      {title ? (
+        <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-ink-muted">
+          {title}
+        </p>
+      ) : null}
       <div style={{ width: '100%', height }}>
         <ResponsiveContainer width="100%" height="100%">
           {children}

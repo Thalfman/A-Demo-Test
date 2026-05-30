@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { AIBadge } from '@/components/AIBadge';
 import { Card } from '@/components/Card';
@@ -10,7 +10,13 @@ import { IndexBullet } from '@/components/IndexBullet';
 import { SeverityChip } from '@/components/SeverityChip';
 import { StatCard } from '@/components/StatCard';
 import { formatCurrency, formatRatio } from '@/lib/format';
-import type { EvmProjectEntry, RecommendedAction } from '@/lib/types';
+import type { EvmProjectEntry, RecommendedAction, Severity } from '@/lib/types';
+
+const SEVERITY_BORDER: Record<Severity, string> = {
+  high: 'border-l-status-offtrack',
+  medium: 'border-l-status-atrisk',
+  low: 'border-l-ink-faint',
+};
 
 /** Negative money reads as a problem — color it. */
 function Money({ value }: { value: number }) {
@@ -57,6 +63,16 @@ export function EvmExplorer({
 
   const [selectedId, setSelectedId] = useState<string>(worstId);
   const selected = byId.get(selectedId);
+  const drillRef = useRef<HTMLDivElement>(null);
+
+  const selectFromAction = (id: string) => {
+    setSelectedId(id);
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    drillRef.current?.scrollIntoView({
+      behavior: reduce ? 'auto' : 'smooth',
+      block: 'nearest',
+    });
+  };
 
   const columns: Column<EvmProjectEntry>[] = [
     {
@@ -65,91 +81,66 @@ export function EvmExplorer({
       sortValue: (p) => p.name,
       render: (p) => <span className="font-medium">{p.name}</span>,
     },
-    {
-      key: 'cpi',
-      header: 'CPI',
-      align: 'right',
-      sortValue: (p) => p.metrics.cpi,
-      render: (p) => <Ratio value={p.metrics.cpi} />,
-    },
-    {
-      key: 'spi',
-      header: 'SPI',
-      align: 'right',
-      sortValue: (p) => p.metrics.spi,
-      render: (p) => <Ratio value={p.metrics.spi} />,
-    },
-    {
-      key: 'cv',
-      header: 'CV',
-      align: 'right',
-      sortValue: (p) => p.metrics.cv,
-      render: (p) => <Money value={p.metrics.cv} />,
-    },
-    {
-      key: 'vac',
-      header: 'VAC',
-      align: 'right',
-      sortValue: (p) => p.metrics.vac,
-      render: (p) => <Money value={p.metrics.vac} />,
-    },
-    {
-      key: 'eac',
-      header: 'EAC',
-      align: 'right',
-      sortValue: (p) => p.metrics.eac,
-      render: (p) => formatCurrency(p.metrics.eac),
-    },
+    { key: 'cpi', header: 'CPI', align: 'right', sortValue: (p) => p.metrics.cpi, render: (p) => <Ratio value={p.metrics.cpi} /> },
+    { key: 'spi', header: 'SPI', align: 'right', sortValue: (p) => p.metrics.spi, render: (p) => <Ratio value={p.metrics.spi} /> },
+    { key: 'cv', header: 'CV', align: 'right', sortValue: (p) => p.metrics.cv, render: (p) => <Money value={p.metrics.cv} /> },
+    { key: 'vac', header: 'VAC', align: 'right', sortValue: (p) => p.metrics.vac, render: (p) => <Money value={p.metrics.vac} /> },
+    { key: 'eac', header: 'EAC', align: 'right', sortValue: (p) => p.metrics.eac, render: (p) => formatCurrency(p.metrics.eac) },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Card
+        variant="ai"
         title="Recommended actions"
         action={<AIBadge generatedAt={generatedAt} />}
       >
         <p className="mb-3 text-sm text-ink-muted">
           AI-generated corrective actions, paired with the variance narrative
-          above.
+          above. Select one to inspect its project.
         </p>
-        <ul className="space-y-3">
+        <ul className="space-y-2">
           {actions.map((action, i) => {
-            const target = action.projectId
-              ? byId.get(action.projectId)
-              : undefined;
-            const clickable = Boolean(target);
+            const target = action.projectId ? byId.get(action.projectId) : undefined;
             const content: ReactNode = (
               <div className="flex items-start gap-3">
                 <SeverityChip severity={action.severity} />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{action.action}</p>
-                  <p className="mt-0.5 text-sm text-ink-muted">
-                    {action.rationale}
-                  </p>
-                  {target ? (
-                    <p className="mt-1 text-xs font-medium text-brand">
-                      {selectedId === target.projectId
-                        ? `Selected: ${target.name}`
-                        : `View ${target.name} →`}
-                    </p>
-                  ) : (
-                    <p className="mt-1 text-xs text-ink-muted">Portfolio-level</p>
-                  )}
+                  <p className="mt-0.5 text-sm text-ink-muted">{action.rationale}</p>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                    {action.projectId ? (
+                      <span className="font-mono text-[11px] text-ink-faint">
+                        {action.projectId}
+                      </span>
+                    ) : null}
+                    {target ? (
+                      <span className="font-mono text-[11px] font-medium text-ai">
+                        {selectedId === target.projectId
+                          ? `selected: ${target.name}`
+                          : `view ${target.name} →`}
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-ink-muted">Portfolio-level</span>
+                    )}
+                  </div>
                 </div>
               </div>
             );
             return (
               <li key={i}>
-                {clickable ? (
+                {target ? (
                   <button
                     type="button"
-                    onClick={() => setSelectedId(target!.projectId)}
-                    className="w-full rounded-token border border-border p-3 text-left transition-colors hover:border-brand"
+                    onClick={() => selectFromAction(target.projectId)}
+                    className={`w-full rounded-sm border border-l-[3px] border-hairline ${SEVERITY_BORDER[action.severity]} bg-panel p-3 text-left transition-colors duration-state ease-instrument hover:bg-panel-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ai`}
                   >
                     {content}
                   </button>
                 ) : (
-                  <div className="rounded-token border border-border p-3">
+                  <div
+                    className={`rounded-sm border border-l-[3px] border-hairline ${SEVERITY_BORDER[action.severity]} bg-panel p-3`}
+                  >
                     {content}
                   </div>
                 )}
@@ -159,55 +150,55 @@ export function EvmExplorer({
         </ul>
       </Card>
 
-      <Card title="Projects by performance" bodyClassName="p-0">
-        <DataTable<EvmProjectEntry>
-          columns={columns}
-          rows={projects}
-          getRowKey={(p) => p.projectId}
-          initialSort={{ key: 'cpi', dir: 'asc' }}
-          onRowClick={(p) => setSelectedId(p.projectId)}
-          isRowActive={(p) => p.projectId === selectedId}
-        />
-      </Card>
-
-      <Card
-        title={selected ? `Drill-down — ${selected.name}` : 'Drill-down'}
-        action={
-          <span className="text-xs text-ink-muted">Select a row to change</span>
-        }
-      >
-        {selected ? (
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2">
-              <EvmLineChart data={selected.series} height={260} />
-            </div>
-            <div className="space-y-4">
-              <IndexBullet label="CPI (cost)" value={selected.metrics.cpi} />
-              <IndexBullet label="SPI (schedule)" value={selected.metrics.spi} />
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <StatCard
-                  label="CV"
-                  value={<Money value={selected.metrics.cv} />}
-                />
-                <StatCard
-                  label="VAC"
-                  value={<Money value={selected.metrics.vac} />}
-                />
-                <StatCard
-                  label="EAC"
-                  value={formatCurrency(selected.metrics.eac)}
-                />
-                <StatCard
-                  label="BAC"
-                  value={formatCurrency(selected.metrics.bac)}
-                />
-              </div>
-            </div>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <section className="self-start overflow-hidden rounded-md border border-hairline bg-panel shadow-elev">
+          <div className="border-b border-hairline px-4 py-3">
+            <h3 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-ink">
+              Projects by performance
+            </h3>
           </div>
-        ) : (
-          <p className="text-sm text-ink-muted">Select a project to inspect.</p>
-        )}
-      </Card>
+          <DataTable<EvmProjectEntry>
+            columns={columns}
+            rows={projects}
+            getRowKey={(p) => p.projectId}
+            initialSort={{ key: 'cpi', dir: 'asc' }}
+            onRowClick={(p) => setSelectedId(p.projectId)}
+            isRowActive={(p) => p.projectId === selectedId}
+            pulseRowKey={selectedId}
+          />
+        </section>
+
+        <section
+          ref={drillRef}
+          className="self-start rounded-md border border-hairline bg-panel shadow-pop lg:sticky lg:top-16"
+        >
+          <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-3">
+            <h3 className="truncate text-[13px] font-semibold uppercase tracking-[0.06em] text-ink">
+              {selected ? `Drill-down · ${selected.name}` : 'Drill-down'}
+            </h3>
+            <span className="shrink-0 text-[11px] text-ink-muted">Select a row</span>
+          </div>
+          <div className="p-4">
+            {selected ? (
+              <div className="space-y-4">
+                <EvmLineChart data={selected.series} height={200} />
+                <div className="space-y-3">
+                  <IndexBullet label="CPI (cost)" value={selected.metrics.cpi} />
+                  <IndexBullet label="SPI (schedule)" value={selected.metrics.spi} />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <StatCard label="CV" value={<Money value={selected.metrics.cv} />} />
+                  <StatCard label="VAC" value={<Money value={selected.metrics.vac} />} />
+                  <StatCard label="EAC" value={formatCurrency(selected.metrics.eac)} />
+                  <StatCard label="BAC" value={formatCurrency(selected.metrics.bac)} />
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-ink-muted">Select a project to inspect.</p>
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

@@ -11,7 +11,9 @@ import {
   YAxis,
 } from 'recharts';
 
-import { chartPalette, colors } from '@/lib/tokens';
+import { useTheme } from '@/components/theme/ThemeProvider';
+import { useMountOnlyAnimation } from '@/hooks/useMountOnlyAnimation';
+import { getChartColors, radiusPx } from '@/lib/tokens';
 import { ChartContainer } from './ChartContainer';
 
 export interface BarSpec {
@@ -24,9 +26,11 @@ export interface BarSpec {
 
 type Row = Record<string, string | number>;
 
+const MONO = 'var(--font-mono)';
+
 /** Categorical bar chart. One or more bar series keyed off `data` rows. Supports
  *  per-cell coloring (e.g., status distribution) and custom axis/tooltip
- *  formatters (e.g., currency). */
+ *  formatters (e.g., currency). Bars default to ink; status charts pass cells. */
 export function CategoryBarChart({
   data,
   xKey,
@@ -44,24 +48,28 @@ export function CategoryBarChart({
   yTickFormatter?: (v: number) => string;
   valueFormatter?: (v: number) => string;
 }) {
+  const { theme } = useTheme();
+  const c = getChartColors(theme);
+  const animate = useMountOnlyAnimation();
+
   return (
     <ChartContainer height={height}>
       <BarChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke={colors.border} vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={c.grid} vertical={false} />
         <XAxis
           dataKey={xKey}
-          tick={{ fontSize: 11, fill: colors.inkMuted }}
-          stroke={colors.border}
+          tick={{ fontSize: 11, fill: c.tick, fontFamily: MONO }}
+          stroke={c.axis}
         />
         <YAxis
           width={56}
           allowDecimals={false}
-          tick={{ fontSize: 11, fill: colors.inkMuted }}
-          stroke={colors.border}
+          tick={{ fontSize: 11, fill: c.tick, fontFamily: MONO }}
+          stroke={c.axis}
           tickFormatter={yTickFormatter}
         />
         <Tooltip
-          cursor={{ fill: `${colors.brand}0d` }}
+          cursor={{ fill: c.grid, fillOpacity: 0.5 }}
           formatter={
             valueFormatter
               ? (value: number, name) => [valueFormatter(value), name]
@@ -69,9 +77,14 @@ export function CategoryBarChart({
           }
           contentStyle={{
             fontSize: 12,
-            borderRadius: 8,
-            border: `1px solid ${colors.border}`,
+            fontFamily: MONO,
+            borderRadius: radiusPx,
+            backgroundColor: c.tooltipBg,
+            border: `1px solid ${c.tooltipBorder}`,
+            color: c.tooltipText,
           }}
+          labelStyle={{ color: c.tooltipText }}
+          itemStyle={{ color: c.tooltipText }}
         />
         {bars.length > 1 ? <Legend wrapperStyle={{ fontSize: 12 }} /> : null}
         {bars.map((bar, barIndex) => (
@@ -79,9 +92,10 @@ export function CategoryBarChart({
             key={bar.key}
             dataKey={bar.key}
             name={bar.name ?? bar.key}
-            fill={bar.color ?? chartPalette[barIndex % chartPalette.length]}
+            fill={bar.color ?? c.chartPalette[barIndex % c.chartPalette.length]}
             stackId={stacked ? 'stack' : undefined}
             radius={stacked ? undefined : [4, 4, 0, 0]}
+            isAnimationActive={animate}
           >
             {bar.cellColors
               ? data.map((_, idx) => (
@@ -89,7 +103,7 @@ export function CategoryBarChart({
                     key={idx}
                     fill={
                       bar.cellColors![idx] ??
-                      chartPalette[idx % chartPalette.length]
+                      c.chartPalette[idx % c.chartPalette.length]
                     }
                   />
                 ))
