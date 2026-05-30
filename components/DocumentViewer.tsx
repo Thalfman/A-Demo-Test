@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { formatDate } from '@/lib/format';
 import type { AppDocument } from '@/lib/types';
+import { ProjectLink } from './project-drawer/ProjectLink';
 import { AIBadge } from './AIBadge';
 
 /** Render inline `**bold**` and `` `code` `` spans within a line of text. */
@@ -160,7 +161,14 @@ export function DocumentViewer({ doc }: { doc: AppDocument }) {
           <MetaItem label="Effective" value={formatDate(meta.effectiveDate)} />
         ) : null}
         {meta.relatedProjectId ? (
-          <MetaItem label="Project" value={meta.relatedProjectId} />
+          <MetaItem
+            label="Project"
+            value={
+              <ProjectLink id={meta.relatedProjectId}>
+                {meta.relatedProjectId}
+              </ProjectLink>
+            }
+          />
         ) : null}
       </dl>
 

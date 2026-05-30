@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 
+import { ProjectDrawerProvider } from '@/components/project-drawer/ProjectDrawerContext';
 import { AppShell } from '@/components/shell/AppShell';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { getPortfolioPulse } from '@/lib/portfolioPulse';
@@ -41,7 +42,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body className="min-h-screen bg-bg font-sans text-ink antialiased">
         <ThemeProvider>
-          <AppShell pulse={getPortfolioPulse()}>{children}</AppShell>
+          <ProjectDrawerProvider>
+            <AppShell pulse={getPortfolioPulse()}>{children}</AppShell>
+          </ProjectDrawerProvider>
         </ThemeProvider>
       </body>
     </html>

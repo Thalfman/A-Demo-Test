@@ -4,6 +4,7 @@ import { useMemo, useState, type ReactNode } from 'react';
 
 import { Card } from '@/components/Card';
 import { DataTable, type Column } from '@/components/DataTable';
+import { ProjectLink } from '@/components/project-drawer/ProjectLink';
 import { SeverityChip } from '@/components/SeverityChip';
 import { DASH, formatCurrency, formatDate, formatNumber } from '@/lib/format';
 import { analyzeReconciliation } from '@/lib/reconcile';
@@ -146,7 +147,9 @@ function ExportTable({
                   }`}
                 >
                   <td className="whitespace-nowrap px-3 py-2">
-                    <span className="font-medium">{rec.name}</span>
+                    <span className="font-medium">
+                      <ProjectLink id={rec.projectId}>{rec.name}</ProjectLink>
+                    </span>
                     {onlyHere ? <CountTag>{missingLabel}</CountTag> : null}
                     {dup ? <CountTag>duplicate</CountTag> : null}
                   </td>
@@ -211,7 +214,9 @@ export function ReconClient({
             className="absolute -left-3 h-4 w-[3px] rounded-full"
             style={{ backgroundColor: SEVERITY_COLOR[d.severity] }}
           />
-          <span className="font-medium">{d.name}</span>
+          <span className="font-medium">
+            <ProjectLink id={d.projectId}>{d.name}</ProjectLink>
+          </span>
         </span>
       ),
     },

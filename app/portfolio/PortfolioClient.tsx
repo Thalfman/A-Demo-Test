@@ -9,6 +9,7 @@ import { DataQualityChip } from '@/components/DataQualityChip';
 import { DataTable, type Column } from '@/components/DataTable';
 import { FilterBar, type FilterDef } from '@/components/FilterBar';
 import { KpiStrip, type KpiItem, type KpiTone } from '@/components/KpiStrip';
+import { ProjectLink } from '@/components/project-drawer/ProjectLink';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Trackbar } from '@/components/Trackbar';
@@ -130,7 +131,7 @@ export function PortfolioClient({
             />
           ) : null}
           <span className="font-medium">
-            {p.name}
+            <ProjectLink id={p.id}>{p.name}</ProjectLink>
             {p.isStale ? (
               <span className="ml-2 font-mono text-[11px] font-normal text-ink-muted">
                 stale

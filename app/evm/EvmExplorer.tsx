@@ -7,6 +7,7 @@ import { Card } from '@/components/Card';
 import { DataTable, type Column } from '@/components/DataTable';
 import { EvmLineChart } from '@/components/EvmLineChart';
 import { IndexBullet } from '@/components/IndexBullet';
+import { ProjectLink } from '@/components/project-drawer/ProjectLink';
 import { SeverityChip } from '@/components/SeverityChip';
 import { StatCard } from '@/components/StatCard';
 import { formatCurrency, formatRatio } from '@/lib/format';
@@ -79,7 +80,11 @@ export function EvmExplorer({
       key: 'name',
       header: 'Project',
       sortValue: (p) => p.name,
-      render: (p) => <span className="font-medium">{p.name}</span>,
+      render: (p) => (
+        <span className="font-medium">
+          <ProjectLink id={p.projectId}>{p.name}</ProjectLink>
+        </span>
+      ),
     },
     { key: 'cpi', header: 'CPI', align: 'right', sortValue: (p) => p.metrics.cpi, render: (p) => <Ratio value={p.metrics.cpi} /> },
     { key: 'spi', header: 'SPI', align: 'right', sortValue: (p) => p.metrics.spi, render: (p) => <Ratio value={p.metrics.spi} /> },
@@ -116,9 +121,10 @@ export function EvmExplorer({
                     ) : null}
                     {target ? (
                       <span className="font-mono text-[11px] font-medium text-ai">
-                        {selectedId === target.projectId
-                          ? `selected: ${target.name}`
-                          : `view ${target.name} →`}
+                        {selectedId === target.projectId ? 'selected: ' : 'open '}
+                        <ProjectLink id={target.projectId}>
+                          {target.name}
+                        </ProjectLink>
                       </span>
                     ) : (
                       <span className="text-[11px] text-ink-muted">Portfolio-level</span>
@@ -130,13 +136,20 @@ export function EvmExplorer({
             return (
               <li key={i}>
                 {target ? (
-                  <button
-                    type="button"
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => selectFromAction(target.projectId)}
-                    className={`w-full rounded-sm border border-l-[3px] border-hairline ${SEVERITY_BORDER[action.severity]} bg-panel p-3 text-left transition-colors duration-state ease-instrument hover:bg-panel-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ai`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectFromAction(target.projectId);
+                      }
+                    }}
+                    className={`w-full cursor-pointer rounded-sm border border-l-[3px] border-hairline ${SEVERITY_BORDER[action.severity]} bg-panel p-3 text-left transition-colors duration-state ease-instrument hover:bg-panel-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ai`}
                   >
                     {content}
-                  </button>
+                  </div>
                 ) : (
                   <div
                     className={`rounded-sm border border-l-[3px] border-hairline ${SEVERITY_BORDER[action.severity]} bg-panel p-3`}
